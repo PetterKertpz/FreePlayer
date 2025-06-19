@@ -1,9 +1,8 @@
 package com.freeplayer.service;
 
-import com.freeplayer.dao.ConfiguracionUsuarioDAO; // Importar
+import com.freeplayer.dao.ConfiguracionUsuarioDAO;
 import com.freeplayer.dao.TemaUIDAO;
-import com.freeplayer.dao.impl.ConfiguracionUsuarioDAOImpl; // Importar
-import com.freeplayer.dao.impl.TemaUIDAOImpl;
+import com.freeplayer.model.ConfiguracionUsuario;
 import com.freeplayer.model.TemaUI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,34 +13,78 @@ import java.util.Optional;
 public class TemaUIService {
 
     private static final Logger logger = LoggerFactory.getLogger(TemaUIService.class);
-    private final TemaUIDAO temaDAO = new TemaUIDAOImpl();
-    // Necesitamos acceso al DAO de configuración para reasignar usuarios
-    private final ConfiguracionUsuarioDAO configDAO = new ConfiguracionUsuarioDAOImpl();
+    private final TemaUIDAO temaDAO;
+    private final ConfiguracionUsuarioService configService; // Necesita saber de la configuración
     private static final int ID_TEMA_POR_DEFECTO = 1;
 
-    // ... (métodos existentes como crearTema, obtenerTodosLosTemas)
+    // Inyección de dependencias
+    public TemaUIService(TemaUIDAO temaDAO, ConfiguracionUsuarioService configService) {
+        this.temaDAO = temaDAO;
+        this.configService = configService;
+    }
 
     /**
-     * Elimina un tema por su ID. Antes de eliminarlo, reasigna a todos los
-     * usuarios que lo estuvieran usando al tema por defecto.
-     * No se puede eliminar el tema por defecto.
-     * @param id El ID del tema a eliminar.
+     * Crea un nuevo tema personalizado para un usuario y lo establece como su tema actual.
+     * @return El objeto TemaUI recién creado.
      */
-    public void eliminarTema(int id) {
-        if (id == ID_TEMA_POR_DEFECTO) {
-            logger.warn("Intento de eliminar el tema por defecto (ID: {}). Operación denegada.", id);
-            return; // No permitir que el tema por defecto sea eliminado.
+    public Optional<TemaUI> crearTemaPersonalizado(int idUsuario, String nombreTema, String jsonConfig) {
+        TemaUI nuevoTema = new TemaUI();
+        nuevoTema.setNombreTema(nombreTema);
+        nuevoTema.setConfiguracionJson(jsonConfig);
+        nuevoTema.setIdPropietario(idUsuario); // Se asigna el dueño
+
+        try {
+            temaDAO.insertar(nuevoTema);
+            if (nuevoTema.getId() > 0) {
+                // Después de crearlo, lo asignamos como el tema actual del usuario
+                configService.actualizarTemaUsuario(idUsuario, nuevoTema.getId());
+                logger.info("Nuevo tema personalizado con ID {} creado y asignado al usuario {}", nuevoTema.getId(), idUsuario);
+                return Optional.of(nuevoTema);
+            }
+        } catch (Exception e) {
+            logger.error("No se pudo crear el tema personalizado para el usuario {}", idUsuario, e);
+        }
+        return Optional.empty();
+    }
+
+    /**
+     * Elimina un tema personalizado. No se puede eliminar un tema global.
+     * Si el usuario está usando el tema que va a eliminar, se le reasigna el tema por defecto.
+     */
+    public boolean eliminarTemaPersonalizado(int idTema, int idUsuario) {
+        if (idTema == ID_TEMA_POR_DEFECTO) {
+            logger.warn("Intento de eliminar el tema por defecto (ID: {}). Operación denegada.", idTema);
+            return false;
         }
 
-        logger.info("Iniciando proceso para eliminar tema de UI con ID: {}", id);
+        Optional<TemaUI> temaOpt = temaDAO.consultarPorId(idTema);
+        if (temaOpt.isEmpty()) {
+            logger.warn("Intento de eliminar un tema que no existe (ID: {})", idTema);
+            return false;
+        }
 
-        // 1. Reasignar todos los usuarios que usaban este tema al tema por defecto.
-        // Esta operación es crucial y debe ocurrir ANTES de borrar el tema.
-        configDAO.reasignarTemaMasivamente(id, ID_TEMA_POR_DEFECTO);
+        TemaUI tema = temaOpt.get();
+        // Verificar que el usuario sea el propietario del tema
+        if (tema.getIdPropietario() == null || tema.getIdPropietario() != idUsuario) {
+            logger.warn("El usuario {} intentó eliminar el tema {}, pero no es el propietario.", idUsuario, idTema);
+            return false;
+        }
 
-        // 2. Ahora que ningún usuario depende de este tema, podemos eliminarlo de forma segura.
-        temaDAO.eliminar(id);
+        // Verificar si el usuario está usando este tema actualmente
+        Optional<ConfiguracionUsuario> configOpt = configService.buscarConfiguracionPorUsuario(idUsuario);
+        if (configOpt.isPresent() && configOpt.get().getTema().getId() == idTema) {
+            // Si lo está usando, reestablecer al por defecto ANTES de borrar el tema
+            logger.info("El usuario {} está usando el tema a eliminar. Reestableciendo al por defecto.", idUsuario);
+            configService.restaurarConfiguracionPorDefecto(idUsuario);
+        }
 
-        logger.info("Proceso de eliminación del tema ID: {} completado.", id);
+        // Ahora sí, eliminar el tema de forma segura
+        temaDAO.eliminar(idTema);
+        logger.info("Tema personalizado ID {} eliminado exitosamente por el usuario {}.", idTema, idUsuario);
+        return true;
+    }
+
+    public List<TemaUI> listarTemasDisponibles(int idUsuario) {
+        return temaDAO.listarTemasDisponiblesParaUsuario(idUsuario);
     }
 }

@@ -1,19 +1,15 @@
 package com.freeplayer.dao;
 
 import com.freeplayer.model.ConfiguracionUsuario;
+
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.Optional;
 
 public interface ConfiguracionUsuarioDAO {
 
-    void insertar(ConfiguracionUsuario config);
-    void actualizar(ConfiguracionUsuario config);
+    void insertar(ConfiguracionUsuario config, Connection conn) throws SQLException;
+    void actualizar(ConfiguracionUsuario config, Connection conn) throws SQLException;
     Optional<ConfiguracionUsuario> consultarPorIdUsuario(int idUsuario);
-
-    /**
-     * Reasigna todos los usuarios que usan un tema específico a otro tema.
-     * Útil para cuando un tema se va a eliminar.
-     * @param idTemaAntiguo El ID del tema que se va a reemplazar.
-     * @param idTemaNuevo El ID del nuevo tema que se asignará.
-     */
-    void reasignarTemaMasivamente(int idTemaAntiguo, int idTemaNuevo); // <-- AÑADIR ESTA LÍNEA
+    void reasignarTemaMasivamente(int idTemaAntiguo, int idTemaNuevo);
 }

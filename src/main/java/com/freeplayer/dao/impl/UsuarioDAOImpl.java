@@ -2,11 +2,12 @@ package com.freeplayer.dao.impl;
 
 import com.freeplayer.config.DBConnectionPool;
 import com.freeplayer.dao.UsuarioDAO;
+import com.freeplayer.exceptions.DataAccessException;
 import com.freeplayer.model.Usuario;
 import org.mindrot.jbcrypt.BCrypt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.freeplayer.exceptions.DataAccessException;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,12 +18,13 @@ public class UsuarioDAOImpl implements UsuarioDAO {
     private static final Logger logger = LoggerFactory.getLogger(UsuarioDAOImpl.class);
 
     @Override
-    public Usuario insertar(Usuario usuario) {
+    public Usuario insertar(Usuario usuario, Connection conn) throws SQLException {
         String sql = "INSERT INTO usuarios (nombre_usuario, email, contrasena, pais_iso) VALUES (?, ?, ?, ?)";
         String contrasenaHasheada = BCrypt.hashpw(usuario.getContrasena(), BCrypt.gensalt());
 
-        try (Connection conn = DBConnectionPool.getConnection().orElseThrow(() -> new SQLException("Conexión nula"));
-             PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        // La conexión es provista por la capa de servicio, no se gestiona aquí.
+        // Se lanza SQLException para que el servicio pueda hacer rollback si es necesario.
+        try (PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             pstmt.setString(1, usuario.getNombreUsuario());
             pstmt.setString(2, usuario.getEmail());
@@ -35,25 +37,23 @@ public class UsuarioDAOImpl implements UsuarioDAO {
                 try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
                     if (generatedKeys.next()) {
                         usuario.setId(generatedKeys.getInt(1));
-                        usuario.setContrasena(null);
-                        logger.info("Usuario insertado correctamente con ID: {}", usuario.getId());
+                        usuario.setContrasena(null); // Limpiar la contraseña en texto plano
+                        logger.info("Usuario pre-insertado en transacción con ID: {}", usuario.getId());
                         return usuario;
+                    } else {
+                        throw new SQLException("Fallo al crear usuario, no se obtuvo ID.");
                     }
                 }
             }
-        } catch (SQLException e) {
-            logger.error("Error al insertar usuario con email: {}", usuario.getEmail(), e);
-            throw new DataAccessException("No se pudo insertar el usuario.", e);
         }
-        return null;
+        return null; // O lanzar excepción si la inserción no devuelve filas afectadas
     }
 
     @Override
-    public void actualizar(Usuario usuario) {
+    public void actualizar(Usuario usuario, Connection conn) throws SQLException {
         String sql = "UPDATE usuarios SET nombre_usuario = ?, email = ?, pais_iso = ? WHERE id_usuario = ?";
 
-        try (Connection conn = DBConnectionPool.getConnection().orElseThrow(() -> new SQLException("Conexión nula"));
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setString(1, usuario.getNombreUsuario());
             pstmt.setString(2, usuario.getEmail());
@@ -62,20 +62,18 @@ public class UsuarioDAOImpl implements UsuarioDAO {
 
             int affectedRows = pstmt.executeUpdate();
             if (affectedRows > 0) {
-                logger.info("Usuario con ID: {} actualizado correctamente.", usuario.getId());
+                logger.info("Usuario con ID: {} pre-actualizado en transacción.", usuario.getId());
             } else {
-                logger.warn("No se encontró usuario con ID: {} para actualizar.", usuario.getId());
+                logger.warn("No se encontró usuario con ID: {} para actualizar en transacción.", usuario.getId());
             }
-
-        } catch (SQLException e) {
-            logger.error("Error al actualizar el usuario con ID: {}", usuario.getId(), e);
         }
     }
 
+    // --- Métodos que gestionan su propia conexión ---
     @Override
     public void eliminar(int id) {
         String sql = "DELETE FROM usuarios WHERE id_usuario = ?";
-        try (Connection conn = DBConnectionPool.getConnection().orElseThrow(() -> new SQLException("Conexión nula"));
+        try (Connection conn = DBConnectionPool.getConnection().orElseThrow(() -> new DataAccessException("Conexión nula", null));
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setInt(1, id);
@@ -88,9 +86,13 @@ public class UsuarioDAOImpl implements UsuarioDAO {
             }
         } catch (SQLException e) {
             logger.error("Error al eliminar el usuario con ID: {}", id, e);
+            throw new DataAccessException("No se pudo eliminar el usuario.", e);
         }
     }
 
+    // ... los métodos de consulta (consultarPorId, consultarPorEmail, etc.) no cambian ...
+    // ... y el método mapearUsuario tampoco cambia.
+    // (Se omite el resto de métodos de solo lectura por brevedad, permanecen iguales)
     @Override
     public Optional<Usuario> consultarPorId(int id) {
         String sql = "SELECT * FROM usuarios WHERE id_usuario = ?";
@@ -163,7 +165,6 @@ public class UsuarioDAOImpl implements UsuarioDAO {
         return usuarios;
     }
 
-    // Metodo privado de ayuda para no repetir código de mapeo
     private Usuario mapearUsuario(ResultSet rs) throws SQLException {
         Usuario usuario = new Usuario();
         usuario.setId(rs.getInt("id_usuario"));
