@@ -6,12 +6,11 @@ import java.time.LocalDateTime;
 
 
 public class Cancion {
-    private int           id;
+    private int           idCancion;
     private String        nombreCancion;
+    private Duration      duracion;
     private int           idautor;
     private int           idgenero;
-    private int           idalbum;
-    private Duration      duracion;
     private String        url;
     private String        urlMiniatura;
     private int           idListaReproduccion;

@@ -7,6 +7,7 @@ import java.util.Optional;
 import java.util.List;
 
 public interface GeneroDAO {
+
     void insertarGenero(Genero genero, Connection conn) throws SQLException;
 
     void eliminarGenero(Genero genero, Connection conn) throws SQLException;
@@ -15,7 +16,7 @@ public interface GeneroDAO {
 
     Optional<Genero> consultarPorId(int id, Connection conn) throws SQLException;
 
-    Optional<Genero> consultarPorNombre(String nombre, Connection conn) throws SQLException;
+    Optional<Genero> consultarPorNombre(String nombre) throws SQLException;
 
     List<Genero> listarTodos();
 }
