@@ -1,3 +1,5 @@
+// src/main/java/com/freeplayer/dao/AutorDAO.java
+
 package com.freeplayer.dao;
 
 import com.freeplayer.model.Autor;
@@ -14,10 +16,14 @@ public interface AutorDAO {
 
     Autor actualizarAutor(Autor autor, Connection conn) throws SQLException;
 
+    // Método existente que gestiona su propia conexión
     Optional<Autor> consultarPorId(int id);
+    
+    // --- NUEVO METODO AÑADIDO ---
+    // Método para ser usado dentro de una transacción existente
+    Optional<Autor> consultarPorId(int id, Connection conn) throws SQLException;
+
     Optional<Autor> consultarPorNombre(String nombre);
 
     List<Autor> listarTodos();
-
-
 }

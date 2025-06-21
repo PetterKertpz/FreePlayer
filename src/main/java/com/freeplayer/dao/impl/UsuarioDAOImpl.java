@@ -112,22 +112,24 @@ public class UsuarioDAOImpl implements UsuarioDAO {
     }
 
     @Override
-    public Optional<Usuario> consultarPorEmail(String email) {
-        String sql = "SELECT * FROM usuarios WHERE email = ?";
-        try (Connection conn = DBConnectionPool.getConnection().orElseThrow(() -> new SQLException("Conexión nula"));
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+public Optional<Usuario> consultarPorEmail(String email) {
+    String sql = "SELECT * FROM usuarios WHERE email = ?";
+    try (Connection conn = DBConnectionPool.getConnection().orElseThrow(() -> new DataAccessException("Conexión nula", null));
+         PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-            pstmt.setString(1, email);
-            try (ResultSet rs = pstmt.executeQuery()) {
-                if (rs.next()) {
-                    return Optional.of(mapearUsuario(rs));
-                }
+        pstmt.setString(1, email);
+        try (ResultSet rs = pstmt.executeQuery()) {
+            if (rs.next()) {
+                return Optional.of(mapearUsuario(rs));
             }
-        } catch (SQLException e) {
-            logger.error("Error al consultar usuario por email: {}", email, e);
         }
-        return Optional.empty();
+    } catch (SQLException e) {
+        logger.error("Error al consultar usuario por email: {}", email, e);
+        // RELANZAR LA EXCEPCIÓN
+        throw new DataAccessException("Error al consultar usuario por email", e);
     }
+    return Optional.empty();
+}
 
     @Override
     public Optional<Usuario> consultarPorNombreUsuario(String nombreUsuario) {

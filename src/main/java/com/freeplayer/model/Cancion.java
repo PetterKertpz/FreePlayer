@@ -6,30 +6,36 @@ import java.time.LocalDateTime;
 
 
 public class Cancion {
-    private int           id;
+    private int           idCancion;
     private String        nombreCancion;
+    private Duration      duracion;
     private int           idautor;
     private int           idgenero;
-    private int           idalbum;
-    private Duration      duracion;
     private String        url;
+    private int           idalbum;
     private String        urlMiniatura;
-    private int           idListaReproduccion;
     private LocalDateTime fechaPublicacion;
 
     public Cancion() {
     }
-    public Cancion(int id, String nombreCancion, int idautor, int idgenero, int idalbum, Duration duracion, String url, String urlMiniatura, int idListaReproduccion, LocalDateTime fechaPublicacion) {
-        this.id = id;
+    public Cancion(int id, String nombreCancion, int idautor, int idgenero, int idAlbum,Duration duracion,
+                   String url,
+                   String urlMiniatura, LocalDateTime fechaPublicacion) {
+        this.idCancion = id;
         this.nombreCancion = nombreCancion;
         this.idautor = idautor;
         this.idgenero = idgenero;
-        this.idalbum = idalbum;
         this.duracion = duracion;
         this.url = url;
         this.urlMiniatura = urlMiniatura;
-        this.idListaReproduccion = idListaReproduccion;
         this.fechaPublicacion = fechaPublicacion;
+    }
+     public int getIdalbum() { // <--- 2. AÑADE ESTE METODO GETTER
+        return idalbum;
+    }
+
+    public void setIdalbum(int idalbum) { // <--- 3. AÑADE ESTE METODO SETTER
+        this.idalbum = idalbum;
     }
 
     public LocalDateTime getFechaPublicacion() {
@@ -38,14 +44,6 @@ public class Cancion {
 
     public void setFechaPublicacion(LocalDateTime fechaPublicacion) {
         this.fechaPublicacion = fechaPublicacion;
-    }
-
-    public int getIdListaReproduccion() {
-        return idListaReproduccion;
-    }
-
-    public void setIdListaReproduccion(int idListaReproduccion) {
-        this.idListaReproduccion = idListaReproduccion;
     }
 
     public String getUrlMiniatura() {
@@ -88,13 +86,6 @@ public class Cancion {
         this.idgenero = idgenero;
     }
 
-    public int getIdalbum() {
-        return idalbum;
-    }
-
-    public void setIdalbum(int idalbum) {
-        this.idalbum = idalbum;
-    }
 
     public String getNombreCancion() {
         return nombreCancion;
@@ -105,25 +96,23 @@ public class Cancion {
     }
 
     public int getId() {
-        return id;
+        return idCancion    ;
     }
 
     public void setId(int id) {
-        this.id = id;
+        this.idCancion = id;
     }
 
     @Override
     public String toString() {
         return "Cancion{" +
-                "id=" + id +
+                "id=" + idCancion +
                 ", nombreCancion='" + nombreCancion + '\'' +
                 ", idautor=" + idautor +
                 ", idgenero=" + idgenero +
-                ", idalbum=" + idalbum +
                 ", duracion=" + duracion +
                 ", url='" + url + '\'' +
                 ", urlMiniatura='" + urlMiniatura + '\'' +
-                ", idListaReproduccion=" + idListaReproduccion +
                 ", fechaPublicacion=" + fechaPublicacion +
                 '}';
     }
