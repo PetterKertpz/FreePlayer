@@ -1,5 +1,11 @@
 package com.pmk.freeplayer.domain.model
 
+import com.pmk.freeplayer.domain.model.enums.ColorAcento
+import com.pmk.freeplayer.domain.model.enums.IdiomaApp
+import com.pmk.freeplayer.domain.model.enums.ModoRepeticion
+import com.pmk.freeplayer.domain.model.enums.ModoTema
+import com.pmk.freeplayer.domain.model.enums.PresetEcualizador
+import com.pmk.freeplayer.domain.model.enums.TamanioFuente
 import com.pmk.freeplayer.domain.model.enums.TipoOrdenamiento
 
 data class PreferenciasUsuario(
