@@ -1,12 +1,15 @@
 package com.pmk.freeplayer.domain.model
 
+import com.pmk.freeplayer.domain.model.enums.FuenteLetra
+import com.pmk.freeplayer.domain.model.enums.TipoLetra
+
 data class LetraCancion(
-    val cancionId: Long,
-    val tipo: TipoLetra,
-    val contenido: String?, // letra completa (texto plano)
-    val lineasSincronizadas: List<LineaLetra>?,
-    val fuente: FuenteLetra,
-    val idioma: String?, // código ISO (es, en, etc.)
+	val cancionId: Long,
+	val tipo: TipoLetra,
+	val contenido: String?, // letra completa (texto plano)
+	val lineasSincronizadas: List<LineaLetra>?,
+	val fuente: FuenteLetra,
+	val idioma: String?, // código ISO (es, en, etc.)
 ) {
   val tieneLetra: Boolean
     get() = tipo != TipoLetra.NINGUNA
@@ -29,15 +32,6 @@ data class LineaLetra(
     }
 }
 
-enum class TipoLetra {
-  NINGUNA, // sin letra disponible
-  SIMPLE, // texto sin sincronizar
-  SINCRONIZADA, // formato LRC con tiempos
-}
 
-enum class FuenteLetra(val nombreMostrar: String) {
-  INCRUSTADA("Incrustada en archivo"),
-  ARCHIVO_LOCAL("Archivo .lrc local"),
-  EN_LINEA("Descargada de internet"),
-  MANUAL("Ingresada manualmente"),
-}
+
+

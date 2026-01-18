@@ -1,6 +1,6 @@
 package com.pmk.freeplayer.domain.model
 
-data class DatosGenius(
+data class Genius(
 	val geniusId: Long,
 	val titulo: String,
 	val artista: String,

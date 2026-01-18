@@ -6,17 +6,16 @@ enum class ModoTema(val nombreMostrar: String) {
     SISTEMA("Seguir sistema")
 }
 
-enum class ColorAcento(val nombreMostrar: String, val codigoHex: String) {
-    PREDETERMINADO("Predeterminado", "#6200EE"),
-    ROJO("Rojo", "#F44336"),
-    ROSA("Rosa", "#E91E63"),
-    MORADO("Morado", "#9C27B0"),
-    AZUL("Azul", "#2196F3"),
-    CIAN("Cian", "#00BCD4"),
-    VERDE_AZULADO("Verde azulado", "#009688"),
-    VERDE("Verde", "#4CAF50"),
-    NARANJA("Naranja", "#FF9800"),
-    AMBAR("Ámbar", "#FFC107")
+enum class ColorAcento(val nombreMostrar: String) {
+    PREDETERMINADO("Predeterminado"),
+    ROJO("Rojo"),
+    ROSA("Rosa"),
+    AZUL("Azul"),
+    CIAN("Cian"),
+    VERDE_AZULADO("Verde azulado"),
+    VERDE("Verde"),
+    NARANJA("Naranja"),
+    AMBAR("Ámbar")
 }
 
 enum class ModoRepeticion(val nombreMostrar: String) {
