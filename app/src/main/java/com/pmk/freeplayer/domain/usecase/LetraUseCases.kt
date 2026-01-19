@@ -1,7 +1,6 @@
-package com.pmk.freeplayer.domain.usecase.letra
+package com.pmk.freeplayer.domain.usecase
 
 import com.pmk.freeplayer.domain.model.LetraCancion
-import com.pmk.freeplayer.domain.repository.LetraRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 

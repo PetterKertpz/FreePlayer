@@ -1,6 +1,5 @@
-package com.pmk.freeplayer.domain.usecase.artista
+package com.pmk.freeplayer.domain.usecase
 
-import com.pmk.freeplayer.domain.repository.ArtistaRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 import javax.inject.Inject
@@ -9,30 +8,37 @@ import javax.inject.Inject
 // CONSULTAS
 // ════════════════════════════════════════════════════════════
 
-class ObtenerTodosArtistasUseCase @Inject constructor(
-	private val repository: ArtistaRepository
+class ObtenerTodosAlbumesUseCase @Inject constructor(
+	private val repository: AlbumRepository
 ) {
-	operator fun invoke(): Flow<List<Artista>> = repository.obtenerTodos()
+	operator fun invoke(): Flow<List<Album>> = repository.obtenerTodos()
 }
 
-class ObtenerArtistaPorIdUseCase @Inject constructor(
-	private val repository: ArtistaRepository
+class ObtenerAlbumPorIdUseCase @Inject constructor(
+	private val repository: AlbumRepository
 ) {
-	operator fun invoke(id: Long): Flow<Artista?> = repository.obtenerPorId(id)
+	operator fun invoke(id: Long): Flow<Album?> = repository.obtenerPorId(id)
 }
 
-class ObtenerArtistasOrdenadosUseCase @Inject constructor(
-	private val repository: ArtistaRepository
+class ObtenerAlbumesPorArtistaUseCase @Inject constructor(
+	private val repository: AlbumRepository
+) {
+	operator fun invoke(artista: String): Flow<List<Album>> =
+		repository.obtenerPorArtista(artista)
+}
+
+class ObtenerAlbumesOrdenadosUseCase @Inject constructor(
+	private val repository: AlbumRepository
 ) {
 	operator fun invoke(
 		ordenamiento: TipoOrdenamiento = TipoOrdenamiento.TITULO_ASC
-	): Flow<List<Artista>> = repository.obtenerOrdenados(ordenamiento)
+	): Flow<List<Album>> = repository.obtenerOrdenados(ordenamiento)
 }
 
-class BuscarArtistasUseCase @Inject constructor(
-	private val repository: ArtistaRepository
+class BuscarAlbumesUseCase @Inject constructor(
+	private val repository: AlbumRepository
 ) {
-	operator fun invoke(consulta: String): Flow<List<Artista>> {
+	operator fun invoke(consulta: String): Flow<List<Album>> {
 		if (consulta.isBlank()) return emptyFlow()
 		return repository.buscar(consulta.trim())
 	}
@@ -42,8 +48,8 @@ class BuscarArtistasUseCase @Inject constructor(
 // ESTADÍSTICAS
 // ════════════════════════════════════════════════════════════
 
-class ObtenerCantidadArtistasUseCase @Inject constructor(
-	private val repository: ArtistaRepository
+class ObtenerCantidadAlbumesUseCase @Inject constructor(
+	private val repository: AlbumRepository
 ) {
 	suspend operator fun invoke(): Result<Int> {
 		return try {

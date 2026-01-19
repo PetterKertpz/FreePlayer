@@ -1,4 +1,4 @@
-package com.pmk.freeplayer.domain.usecase.genius
+package com.pmk.freeplayer.domain.usecase
 
 import com.pmk.freeplayer.domain.repository.GeniusRepository
 import com.pmk.freeplayer.domain.service.ComparadorCanciones

@@ -1,4 +1,4 @@
-package com.pmk.freeplayer.domain.usecase.reproductor
+package com.pmk.freeplayer.domain.usecase
 
 import com.pmk.freeplayer.domain.model.enums.ModoRepeticion
 import com.pmk.freeplayer.domain.repository.ReproductorRepository

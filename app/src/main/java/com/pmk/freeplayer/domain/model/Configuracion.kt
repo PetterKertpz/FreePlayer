@@ -80,10 +80,16 @@ data class EstadisticasBiblioteca(
 data class LogApp(
 	val id: Long = 0,
 	val timestamp: Long,
-	val nivel: String,
+	val nivel: NivelLog,
 	val fase: EstadoProcesoMedia,
 	val mensaje: String,
 	val cancionId: Long?,
 	val detalles: Map<String, String>?,
 	val stackTrace: String?,
 )
+enum class NivelLog {
+	DEBUG,
+	INFO,
+	WARNING,
+	ERROR
+}

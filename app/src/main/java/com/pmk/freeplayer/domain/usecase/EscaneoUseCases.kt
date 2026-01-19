@@ -1,4 +1,4 @@
-package com.pmk.freeplayer.domain.usecase.escaneo
+package com.pmk.freeplayer.domain.usecase
 
 import com.pmk.freeplayer.domain.repository.EscaneoRepository
 import kotlinx.coroutines.flow.Flow

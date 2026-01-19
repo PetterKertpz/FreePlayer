@@ -1,6 +1,5 @@
-package com.pmk.freeplayer.domain.usecase.cancion
+package com.pmk.freeplayer.domain.usecase
 
-import com.pmk.freeplayer.domain.repository.CancionRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 import javax.inject.Inject

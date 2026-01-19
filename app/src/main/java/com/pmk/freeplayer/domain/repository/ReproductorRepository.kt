@@ -1,58 +1,55 @@
 package com.pmk.freeplayer.domain.repository
 
-import com.pmk.freeplayer.domain.model.enums.ModoRepeticion
+import com.pmk.freeplayer.domain.model.Cancion
+import com.pmk.freeplayer.domain.model.ColaReproduccion
+import com.pmk.freeplayer.domain.model.config.ModoRepeticion
 import kotlinx.coroutines.flow.Flow
 
 interface ReproductorRepository {
 	
 	// ─────────────────────────────────────────────────────────────
-	// Guardar/Restaurar estado
+	// 💾 PERSISTENCIA (Guardar estado entre sesiones)
 	// ─────────────────────────────────────────────────────────────
-	suspend fun guardarEstado(
+	suspend fun guardarEstadoSesion(
 		cancionId: Long?,
-		posicion: Long,
+		posicionMs: Long,
 		colaIds: List<Long>,
-		indiceActual: Int,
+		indiceActual: Int
 	)
 	
-	fun obtenerUltimaCancionId(): Flow<Long?>
-	
+	// Recuperar la última sesión al abrir la app
 	fun obtenerUltimaPosicion(): Flow<Long>
-	
-	fun obtenerUltimaCola(): Flow<ColaReproduccion>
+	fun obtenerUltimoIndice(): Flow<Int>
+	fun obtenerUltimaColaIds(): Flow<List<Long>> // Solo IDs para no cargar todo el contenido
 	
 	// ─────────────────────────────────────────────────────────────
-	// Gestión de cola (NUEVO)
+	// 🎵 GESTIÓN DE LA COLA ACTIVA (En Memoria)
 	// ─────────────────────────────────────────────────────────────
+	// Observa la cola actual en tiempo real
+	fun obtenerColaActual(): Flow<ColaReproduccion>
+	
 	suspend fun establecerCola(canciones: List<Cancion>, indiceInicial: Int = 0)
 	
-	suspend fun agregarACola(cancion: Cancion)
+	suspend fun actualizarIndiceActual(nuevoIndice: Int)
 	
 	suspend fun agregarACola(canciones: List<Cancion>)
 	
-	suspend fun quitarDeCola(indice: Int)
+	suspend fun agregarAlFinal(cancion: Cancion)
+	
+	suspend fun agregarAcontinuacion(cancion: Cancion) // "Play Next"
+	
+	suspend fun eliminarDeCola(indice: Int)
 	
 	suspend fun moverEnCola(desde: Int, hasta: Int)
 	
 	suspend fun limpiarCola()
 	
 	// ─────────────────────────────────────────────────────────────
-	// Navegación (NUEVO)
-	// ─────────────────────────────────────────────────────────────
-	suspend fun irASiguiente(): Cancion?
-	
-	suspend fun irAAnterior(): Cancion?
-	
-	suspend fun irAIndice(indice: Int): Cancion?
-	
-	// ─────────────────────────────────────────────────────────────
-	// Configuración de reproducción
+	// 🎛️ CONFIGURACIÓN DE REPRODUCCIÓN
 	// ─────────────────────────────────────────────────────────────
 	fun obtenerModoRepeticion(): Flow<ModoRepeticion>
-	
 	suspend fun setModoRepeticion(modo: ModoRepeticion)
 	
 	fun obtenerAleatorioActivado(): Flow<Boolean>
-	
 	suspend fun setAleatorioActivado(activado: Boolean)
 }

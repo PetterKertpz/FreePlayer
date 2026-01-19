@@ -1,25 +1,70 @@
 package com.pmk.freeplayer.domain.repository
 
+import com.pmk.freeplayer.domain.model.Cancion
+import com.pmk.freeplayer.domain.model.GeniusMetadata
+import com.pmk.freeplayer.domain.model.LetraCancion
+import com.pmk.freeplayer.domain.model.audio.EstadoLetra
+import kotlinx.coroutines.flow.Flow
+
 interface GeniusRepository {
 
-  // ─────────────────────────────────────────────────────────────
-  // Búsqueda en API
-  // ─────────────────────────────────────────────────────────────
-  suspend fun buscarCancion(titulo: String, artista: String): ResultadoBusquedaGenius?
+   // ═════════════════════════════════════════════════════════════
+   // LETRAS
+   // ═════════════════════════════════════════════════════════════
 
-  suspend fun obtenerDetallesCancion(geniusId: Long): Genius?
+   // ─────────────────────────────────────────────────────────────
+   // Obtención y gestión de letras
+   // ─────────────────────────────────────────────────────────────
+   fun obtenerLetra(cancionId: Long): Flow<LetraCancion?>
 
-  // ─────────────────────────────────────────────────────────────
-  // Scraping de letras
-  // ─────────────────────────────────────────────────────────────
-  suspend fun obtenerLetra(geniusUrl: String): String?
+   suspend fun guardarLetra(letra: LetraCancion)
 
-  // ─────────────────────────────────────────────────────────────
-  // Caché de búsquedas fallidas (evitar re-buscar)
-  // ─────────────────────────────────────────────────────────────
-  suspend fun marcarBusquedaFallida(cancionId: Long)
+   suspend fun eliminarLetra(cancionId: Long)
 
-  suspend fun fueBusquedaFallida(cancionId: Long): Boolean
+   suspend fun tieneLetra(cancionId: Long): Boolean
 
-  suspend fun limpiarCacheFallidas(antiguedadDias: Int = 30)
+   // ─────────────────────────────────────────────────────────────
+   // Búsqueda de letras
+   // ─────────────────────────────────────────────────────────────
+   suspend fun buscarLetraEnLinea(titulo: String, artista: String): LetraCancion?
+
+   suspend fun buscarArchivoLrcLocal(rutaCancion: String): LetraCancion?
+
+   // ─────────────────────────────────────────────────────────────
+   // Estados de letras
+   // ─────────────────────────────────────────────────────────────
+   suspend fun actualizarEstadoLetra(cancionId: Long, estado: EstadoLetra)
+
+   suspend fun guardarLetraConEstado(cancionId: Long, letra: String, geniusUrl: String?)
+
+   suspend fun marcarLetraNoEncontrada(cancionId: Long)
+
+   fun obtenerCancionesSinLetraBuscada(limite: Int = 50): Flow<List<Cancion>>
+
+   suspend fun contarPorEstadoLetra(estado: EstadoLetra): Int
+
+   // ═════════════════════════════════════════════════════════════
+   // GENIUS API
+   // ═════════════════════════════════════════════════════════════
+
+   // ─────────────────────────────────────────────────────────────
+   // Búsqueda en API
+   // ─────────────────────────────────────────────────────────────
+   suspend fun buscarCancionEnGenius(titulo: String, artista: String): GeniusMetadata?
+
+   suspend fun obtenerDetallesCancionGenius(geniusId: Long): GeniusMetadata?
+
+   // ─────────────────────────────────────────────────────────────
+   // Scraping de letras desde Genius
+   // ─────────────────────────────────────────────────────────────
+   suspend fun obtenerLetraDesdeGenius(geniusUrl: String): String?
+
+   // ─────────────────────────────────────────────────────────────
+   // Caché de búsquedas fallidas (evitar re-buscar)
+   // ─────────────────────────────────────────────────────────────
+   suspend fun marcarBusquedaGeniusFallida(cancionId: Long)
+
+   suspend fun fueBusquedaGeniusFallida(cancionId: Long): Boolean
+
+   suspend fun limpiarCacheBusquedasFallidas(antiguedadDias: Int = 30)
 }

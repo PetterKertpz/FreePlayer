@@ -1,6 +1,5 @@
-package com.pmk.freeplayer.domain.usecase.log
+package com.pmk.freeplayer.domain.usecase
 
-import com.pmk.freeplayer.domain.repository.LogRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
