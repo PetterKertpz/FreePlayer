@@ -1,7 +1,5 @@
 package com.pmk.freeplayer.domain.usecase.perfil
 
-import com.pmk.freeplayer.domain.model.PerfilUsuario
-import com.pmk.freeplayer.domain.model.enums.Genero
 import com.pmk.freeplayer.domain.repository.PerfilUsuarioRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject

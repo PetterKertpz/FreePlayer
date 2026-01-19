@@ -1,6 +1,5 @@
 package com.pmk.freeplayer.domain.usecase.carpeta
 
-import com.pmk.freeplayer.domain.model.Carpeta
 import com.pmk.freeplayer.domain.repository.CarpetaRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject

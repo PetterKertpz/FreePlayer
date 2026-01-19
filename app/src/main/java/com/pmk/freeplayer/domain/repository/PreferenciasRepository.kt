@@ -7,7 +7,6 @@ import com.pmk.freeplayer.domain.model.enums.ModoRepeticion
 import com.pmk.freeplayer.domain.model.enums.ModoTema
 import com.pmk.freeplayer.domain.model.enums.PresetEcualizador
 import com.pmk.freeplayer.domain.model.enums.TamanioFuente
-import com.pmk.freeplayer.domain.model.enums.TipoOrdenamiento
 import kotlinx.coroutines.flow.Flow
 
 interface PreferenciasRepository {

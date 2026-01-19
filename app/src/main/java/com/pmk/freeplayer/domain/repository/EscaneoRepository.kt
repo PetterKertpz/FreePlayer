@@ -1,8 +1,5 @@
 package com.pmk.freeplayer.domain.repository
 
-import com.pmk.freeplayer.domain.model.ResultadoEnriquecimiento
-import com.pmk.freeplayer.domain.model.ResultadoEscaneo
-import com.pmk.freeplayer.domain.model.ResultadoLimpieza
 import kotlinx.coroutines.flow.Flow
 
 interface EscaneoRepository {

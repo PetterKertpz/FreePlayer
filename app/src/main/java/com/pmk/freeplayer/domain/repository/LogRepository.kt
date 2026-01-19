@@ -1,8 +1,5 @@
 package com.pmk.freeplayer.domain.repository
 
-import com.pmk.freeplayer.domain.model.LogEntry
-import com.pmk.freeplayer.domain.model.enums.FaseProceso
-import com.pmk.freeplayer.domain.model.enums.NivelLog
 import kotlinx.coroutines.flow.Flow
 
 interface LogRepository {

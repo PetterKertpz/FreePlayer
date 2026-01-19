@@ -1,8 +1,5 @@
 package com.pmk.freeplayer.domain.repository
 
-import com.pmk.freeplayer.domain.model.Genius
-import com.pmk.freeplayer.domain.model.ResultadoBusquedaGenius
-
 interface GeniusRepository {
 
   // ─────────────────────────────────────────────────────────────

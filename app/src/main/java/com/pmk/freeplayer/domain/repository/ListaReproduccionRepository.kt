@@ -1,6 +1,5 @@
 package com.pmk.freeplayer.domain.repository
 
-import com.pmk.freeplayer.domain.model.ListaReproduccion
 import kotlinx.coroutines.flow.Flow
 
 interface ListaReproduccionRepository {

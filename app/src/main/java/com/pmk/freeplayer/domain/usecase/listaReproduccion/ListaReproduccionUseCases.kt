@@ -1,6 +1,5 @@
 package com.pmk.freeplayer.domain.usecase.playlist
 
-import com.pmk.freeplayer.domain.model.ListaReproduccion
 import com.pmk.freeplayer.domain.repository.ListaReproduccionRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow

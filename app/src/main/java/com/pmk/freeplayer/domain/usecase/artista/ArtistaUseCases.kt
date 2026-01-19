@@ -1,7 +1,5 @@
 package com.pmk.freeplayer.domain.usecase.artista
 
-import com.pmk.freeplayer.domain.model.Artista
-import com.pmk.freeplayer.domain.model.enums.TipoOrdenamiento
 import com.pmk.freeplayer.domain.repository.ArtistaRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow

@@ -1,8 +1,5 @@
 package com.pmk.freeplayer.domain.usecase.reproductor
 
-import com.pmk.freeplayer.domain.model.Cancion
-import com.pmk.freeplayer.domain.model.ColaReproduccion
-import com.pmk.freeplayer.domain.model.EstadoReproductorGuardado
 import com.pmk.freeplayer.domain.model.enums.ModoRepeticion
 import com.pmk.freeplayer.domain.repository.ReproductorRepository
 import kotlinx.coroutines.flow.Flow

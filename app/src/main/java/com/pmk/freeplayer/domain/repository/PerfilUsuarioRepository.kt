@@ -1,7 +1,5 @@
 package com.pmk.freeplayer.domain.repository
 
-import com.pmk.freeplayer.domain.model.enums.Genero
-import com.pmk.freeplayer.domain.model.PerfilUsuario
 import kotlinx.coroutines.flow.Flow
 
 interface PerfilUsuarioRepository {

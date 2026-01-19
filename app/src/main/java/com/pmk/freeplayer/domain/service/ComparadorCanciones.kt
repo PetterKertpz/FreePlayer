@@ -1,9 +1,5 @@
 package com.pmk.freeplayer.domain.service
 
-import com.pmk.freeplayer.domain.model.Cancion
-import com.pmk.freeplayer.domain.model.ResultadoBusquedaGenius
-import com.pmk.freeplayer.domain.model.ResultadoComparacion
-
 /**
  * Servicio de dominio para comparar canciones locales con resultados de Genius.
  * La implementación estará en la capa data/.

@@ -1,9 +1,5 @@
 package com.pmk.freeplayer.domain.usecase.escaneo
 
-import com.pmk.freeplayer.domain.model.EstadisticasEscaneo
-import com.pmk.freeplayer.domain.model.ResultadoEnriquecimiento
-import com.pmk.freeplayer.domain.model.ResultadoEscaneo
-import com.pmk.freeplayer.domain.model.ResultadoLimpieza
 import com.pmk.freeplayer.domain.repository.EscaneoRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject

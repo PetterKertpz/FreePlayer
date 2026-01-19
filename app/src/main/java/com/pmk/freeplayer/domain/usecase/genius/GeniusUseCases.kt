@@ -1,9 +1,5 @@
 package com.pmk.freeplayer.domain.usecase.genius
 
-import com.pmk.freeplayer.domain.model.Cancion
-import com.pmk.freeplayer.domain.model.Genius
-import com.pmk.freeplayer.domain.model.ResultadoBusquedaGenius
-import com.pmk.freeplayer.domain.model.ResultadoComparacion
 import com.pmk.freeplayer.domain.repository.GeniusRepository
 import com.pmk.freeplayer.domain.service.ComparadorCanciones
 import javax.inject.Inject

@@ -1,8 +1,5 @@
 package com.pmk.freeplayer.domain.usecase.log
 
-import com.pmk.freeplayer.domain.model.LogEntry
-import com.pmk.freeplayer.domain.model.enums.FaseProceso
-import com.pmk.freeplayer.domain.model.enums.NivelLog
 import com.pmk.freeplayer.domain.repository.LogRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject

@@ -1,7 +1,6 @@
 package com.pmk.freeplayer.domain.usecase.historial
 
 import com.pmk.freeplayer.domain.model.Duracion
-import com.pmk.freeplayer.domain.model.HistorialReproduccion
 import com.pmk.freeplayer.domain.repository.HistorialRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject

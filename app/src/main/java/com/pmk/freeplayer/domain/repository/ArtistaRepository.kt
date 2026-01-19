@@ -1,7 +1,5 @@
 package com.pmk.freeplayer.domain.repository
 
-import com.pmk.freeplayer.domain.model.Artista
-import com.pmk.freeplayer.domain.model.enums.TipoOrdenamiento
 import kotlinx.coroutines.flow.Flow
 
 interface ArtistaRepository {

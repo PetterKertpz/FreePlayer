@@ -1,10 +1,5 @@
 package com.pmk.freeplayer.domain.repository
 
-import com.pmk.freeplayer.domain.model.Cancion
-import com.pmk.freeplayer.domain.model.EstadisticasBiblioteca
-import com.pmk.freeplayer.domain.model.enums.EstadoCancion
-import com.pmk.freeplayer.domain.model.enums.Genero
-import com.pmk.freeplayer.domain.model.enums.TipoOrdenamiento
 import kotlinx.coroutines.flow.Flow
 
 interface CancionRepository {

@@ -1,6 +1,5 @@
 package com.pmk.freeplayer.domain.repository
 
-import com.pmk.freeplayer.domain.model.Carpeta
 import kotlinx.coroutines.flow.Flow
 
 interface CarpetaRepository {

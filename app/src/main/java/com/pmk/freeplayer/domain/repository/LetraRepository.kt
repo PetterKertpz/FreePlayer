@@ -1,8 +1,6 @@
 package com.pmk.freeplayer.domain.repository
 
-import com.pmk.freeplayer.domain.model.Cancion
 import com.pmk.freeplayer.domain.model.LetraCancion
-import com.pmk.freeplayer.domain.model.enums.EstadoLetra
 import kotlinx.coroutines.flow.Flow
 
 interface LetraRepository {

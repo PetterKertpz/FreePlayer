@@ -1,7 +1,5 @@
 package com.pmk.freeplayer.domain.repository
 
-import com.pmk.freeplayer.domain.model.Cancion
-import com.pmk.freeplayer.domain.model.ColaReproduccion
 import com.pmk.freeplayer.domain.model.enums.ModoRepeticion
 import kotlinx.coroutines.flow.Flow
 
