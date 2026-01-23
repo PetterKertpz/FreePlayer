@@ -1,7 +1,7 @@
 package com.pmk.freeplayer.domain.repository
 
-import com.pmk.freeplayer.domain.model.Cancion
-import com.pmk.freeplayer.domain.model.GeniusMetadata
+import com.pmk.freeplayer.domain.model.Song
+import com.pmk.freeplayer.domain.model.Genius
 import com.pmk.freeplayer.domain.model.LetraCancion
 import com.pmk.freeplayer.domain.model.audio.EstadoLetra
 import kotlinx.coroutines.flow.Flow
@@ -39,7 +39,7 @@ interface GeniusRepository {
 
    suspend fun marcarLetraNoEncontrada(cancionId: Long)
 
-   fun obtenerCancionesSinLetraBuscada(limite: Int = 50): Flow<List<Cancion>>
+   fun obtenerCancionesSinLetraBuscada(limite: Int = 50): Flow<List<Song>>
 
    suspend fun contarPorEstadoLetra(estado: EstadoLetra): Int
 
@@ -50,9 +50,9 @@ interface GeniusRepository {
    // ─────────────────────────────────────────────────────────────
    // Búsqueda en API
    // ─────────────────────────────────────────────────────────────
-   suspend fun buscarCancionEnGenius(titulo: String, artista: String): GeniusMetadata?
+   suspend fun buscarCancionEnGenius(titulo: String, artista: String): Genius?
 
-   suspend fun obtenerDetallesCancionGenius(geniusId: Long): GeniusMetadata?
+   suspend fun obtenerDetallesCancionGenius(geniusId: Long): Genius?
 
    // ─────────────────────────────────────────────────────────────
    // Scraping de letras desde Genius

@@ -1,13 +1,14 @@
 package com.pmk.freeplayer.domain.repository
 
 import com.pmk.freeplayer.domain.model.Album
-import com.pmk.freeplayer.domain.model.Artista
-import com.pmk.freeplayer.domain.model.Cancion
+import com.pmk.freeplayer.domain.model.Artist
 import com.pmk.freeplayer.domain.model.Carpeta
 import com.pmk.freeplayer.domain.model.EstadisticasBiblioteca
-import com.pmk.freeplayer.domain.model.ListaReproduccion
+import com.pmk.freeplayer.domain.model.Playlist
+import com.pmk.freeplayer.domain.model.SocialLink
+import com.pmk.freeplayer.domain.model.Song
 import com.pmk.freeplayer.domain.model.audio.EstadoIntegridad
-import com.pmk.freeplayer.domain.model.audio.Genero
+import com.pmk.freeplayer.domain.model.audio.Genre
 import com.pmk.freeplayer.domain.model.config.Ordenamiento
 import kotlinx.coroutines.flow.Flow
 
@@ -20,29 +21,29 @@ interface BibliotecaRepository {
    // ─────────────────────────────────────────────────────────────
    // Obtener canciones
    // ─────────────────────────────────────────────────────────────
-   fun obtenerTodasLasCanciones(): Flow<List<Cancion>>
+   fun obtenerTodasLasCanciones(): Flow<List<Song>>
 
-   fun obtenerCancionPorId(id: Long): Flow<Cancion?>
+   fun obtenerCancionPorId(id: Long): Flow<Song?>
 
-   fun obtenerCancionesPorAlbum(albumId: Long): Flow<List<Cancion>>
+   fun obtenerCancionesPorAlbum(albumId: Long): Flow<List<Song>>
 
-   fun obtenerCancionesPorArtista(artista: String): Flow<List<Cancion>>
+   fun obtenerCancionesPorArtista(artista: String): Flow<List<Song>>
 
-   fun obtenerCancionesPorGenero(genero: Genero): Flow<List<Cancion>>
+   fun obtenerCancionesPorGenero(genre: Genre): Flow<List<Song>>
 
-   fun obtenerCancionesPorCarpeta(ruta: String): Flow<List<Cancion>>
+   fun obtenerCancionesPorCarpeta(ruta: String): Flow<List<Song>>
 
-   fun obtenerCancionesOrdenadas(ordenamiento: Ordenamiento): Flow<List<Cancion>>
+   fun obtenerCancionesOrdenadas(ordenamiento: Ordenamiento): Flow<List<Song>>
 
    // ─────────────────────────────────────────────────────────────
    // Búsqueda de canciones
    // ─────────────────────────────────────────────────────────────
-   fun buscarCanciones(consulta: String): Flow<List<Cancion>>
+   fun buscarCanciones(consulta: String): Flow<List<Song>>
 
    // ─────────────────────────────────────────────────────────────
    // Favoritos
    // ─────────────────────────────────────────────────────────────
-   fun obtenerCancionesFavoritas(): Flow<List<Cancion>>
+   fun obtenerCancionesFavoritas(): Flow<List<Song>>
 
    suspend fun marcarCancionComoFavorita(id: Long, esFavorita: Boolean)
 
@@ -51,11 +52,11 @@ interface BibliotecaRepository {
    // ─────────────────────────────────────────────────────────────
    // Estadísticas de reproducción
    // ─────────────────────────────────────────────────────────────
-   fun obtenerCancionesMasReproducidas(limite: Int = 50): Flow<List<Cancion>>
+   fun obtenerCancionesMasReproducidas(limite: Int = 50): Flow<List<Song>>
 
-   fun obtenerCancionesReproducidasRecientemente(limite: Int = 50): Flow<List<Cancion>>
+   fun obtenerCancionesReproducidasRecientemente(limite: Int = 50): Flow<List<Song>>
 
-   fun obtenerCancionesAgregadasRecientemente(limite: Int = 50): Flow<List<Cancion>>
+   fun obtenerCancionesAgregadasRecientemente(limite: Int = 50): Flow<List<Song>>
 
    suspend fun incrementarReproduccionCancion(id: Long)
 
@@ -69,13 +70,13 @@ interface BibliotecaRepository {
    // ─────────────────────────────────────────────────────────────
    // Gestión por estados
    // ─────────────────────────────────────────────────────────────
-   fun obtenerCancionesPorEstado(estado: EstadoIntegridad): Flow<List<Cancion>>
+   fun obtenerCancionesPorEstado(estado: EstadoIntegridad): Flow<List<Song>>
 
-   fun obtenerCancionesCrudas(): Flow<List<Cancion>>
+   fun obtenerCancionesCrudas(): Flow<List<Song>>
 
-   fun obtenerCancionesLimpias(): Flow<List<Cancion>>
+   fun obtenerCancionesLimpias(): Flow<List<Song>>
 
-   fun obtenerCancionesEnriquecidas(): Flow<List<Cancion>>
+   fun obtenerCancionesEnriquecidas(): Flow<List<Song>>
 
    suspend fun contarCancionesPorEstado(estado: EstadoIntegridad): Int
 
@@ -85,14 +86,14 @@ interface BibliotecaRepository {
    suspend fun actualizarEstadoIntegridad(id: Long, estado: EstadoIntegridad)
 
    suspend fun marcarCancionComoLimpia(
-      id: Long,
-      titulo: String,
-      artista: String,
-      album: String,
-      albumArtista: String?,
-      genero: Genero?,
-      anio: Int?,
-      numeroPista: Int?,
+	   id: Long,
+	   titulo: String,
+	   artista: String,
+	   album: String,
+	   albumArtista: String?,
+	   genre: Genre?,
+	   anio: Int?,
+	   numeroPista: Int?,
    )
 
    suspend fun marcarCancionComoEnriquecida(
@@ -105,9 +106,9 @@ interface BibliotecaRepository {
    // ─────────────────────────────────────────────────────────────
    // Escaneo y sincronización
    // ─────────────────────────────────────────────────────────────
-   suspend fun insertarCancionCruda(cancion: Cancion): Long
+   suspend fun insertarCancionCruda(song: Song): Long
 
-   suspend fun insertarCancionesCrudas(canciones: List<Cancion>): List<Long>
+   suspend fun insertarCancionesCrudas(canciones: List<Song>): List<Long>
 
    suspend fun existeCancionPorHash(hash: String): Boolean
 
@@ -144,16 +145,27 @@ interface BibliotecaRepository {
    // ARTISTAS
    // ═════════════════════════════════════════════════════════════
 
-   fun obtenerTodosLosArtistas(): Flow<List<Artista>>
+   fun obtenerTodosLosArtistas(): Flow<List<Artist>>
 
-   fun obtenerArtistaPorId(id: Long): Flow<Artista?>
+   fun obtenerArtistaPorId(id: Long): Flow<Artist?>
 
-   fun obtenerArtistasOrdenados(ordenamiento: Ordenamiento): Flow<List<Artista>>
+   fun obtenerArtistasOrdenados(ordenamiento: Ordenamiento): Flow<List<Artist>>
 
-   fun buscarArtistas(consulta: String): Flow<List<Artista>>
+   fun buscarArtistas(consulta: String): Flow<List<Artist>>
 
    suspend fun obtenerCantidadTotalArtistas(): Int
-
+	
+	// --- REDES SOCIALES ---
+	
+	// Agrega o Actualiza un link
+	suspend fun saveSocialLink(artistId: Long, link: SocialLink)
+	
+	// Elimina un link específico
+	suspend fun deleteSocialLink(linkId: Long)
+	
+	// Obtiene los links de un artista en tiempo real
+	fun getSocialLinks(artistId: Long): Flow<List<SocialLink>>
+	
    // ═════════════════════════════════════════════════════════════
    // CARPETAS
    // ═════════════════════════════════════════════════════════════
@@ -175,9 +187,9 @@ interface BibliotecaRepository {
    // ─────────────────────────────────────────────────────────────
    // CRUD de playlists
    // ─────────────────────────────────────────────────────────────
-   fun obtenerTodasLasPlaylists(): Flow<List<ListaReproduccion>>
+   fun obtenerTodasLasPlaylists(): Flow<List<Playlist>>
 
-   fun obtenerPlaylistPorId(id: Long): Flow<ListaReproduccion?>
+   fun obtenerPlaylistPorId(id: Long): Flow<Playlist?>
 
    suspend fun crearPlaylist(nombre: String, descripcion: String? = null): Long
 
@@ -208,5 +220,5 @@ interface BibliotecaRepository {
    // ─────────────────────────────────────────────────────────────
    // Búsqueda de playlists
    // ─────────────────────────────────────────────────────────────
-   fun buscarPlaylists(consulta: String): Flow<List<ListaReproduccion>>
+   fun buscarPlaylists(consulta: String): Flow<List<Playlist>>
 }

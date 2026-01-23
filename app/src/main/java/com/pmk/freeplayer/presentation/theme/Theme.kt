@@ -123,7 +123,7 @@ private val EsquemaClaro = lightColorScheme(
 // 🎨 TEMA PRINCIPAL DE LA APLICACIÓN
 // ─────────────────────────────────────────────────────────────────
 @Composable
-fun MusicPlayerTheme(
+fun FreePlayerTheme(
     modoOscuro: Boolean = isSystemInDarkTheme(),
     usarColoresDinamicos: Boolean = false,  // Material You
     contenido: @Composable () -> Unit

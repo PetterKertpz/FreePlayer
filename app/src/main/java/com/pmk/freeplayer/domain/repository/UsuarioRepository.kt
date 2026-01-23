@@ -5,7 +5,7 @@ import com.pmk.freeplayer.domain.model.LogApp
 import com.pmk.freeplayer.domain.model.NivelLog
 import com.pmk.freeplayer.domain.model.PerfilUsuario
 import com.pmk.freeplayer.domain.model.PreferenciasUsuario
-import com.pmk.freeplayer.domain.model.audio.Genero
+import com.pmk.freeplayer.domain.model.Genre
 import com.pmk.freeplayer.domain.model.config.ColorAcento
 import com.pmk.freeplayer.domain.model.config.IdiomaApp
 import com.pmk.freeplayer.domain.model.config.ModoRepeticion
@@ -13,7 +13,7 @@ import com.pmk.freeplayer.domain.model.config.ModoTema
 import com.pmk.freeplayer.domain.model.config.Ordenamiento
 import com.pmk.freeplayer.domain.model.config.PresetEcualizador
 import com.pmk.freeplayer.domain.model.config.TamanioFuente
-import com.pmk.freeplayer.domain.model.state.EstadoProcesoMedia
+import com.pmk.freeplayer.domain.model.state.MediaProcessingState
 import kotlinx.coroutines.flow.Flow
 
 interface UsuarioRepository {
@@ -32,7 +32,7 @@ interface UsuarioRepository {
 
    suspend fun incrementarCancionesReproducidas()
 
-   suspend fun actualizarGeneroFavorito(genero: Genero)
+   suspend fun actualizarGeneroFavorito(genre: Genre)
 
    suspend fun actualizarArtistaFavorito(artista: String)
 
@@ -157,25 +157,25 @@ interface UsuarioRepository {
    // Escritura de logs
    // ─────────────────────────────────────────────────────────────
    suspend fun registrarLog(
-      nivel: NivelLog,
-      fase: EstadoProcesoMedia,
-      mensaje: String,
-      cancionId: Long? = null,
-      detalles: Map<String, String>? = null,
-      excepcion: Throwable? = null,
+	   nivel: NivelLog,
+	   fase: MediaProcessingState,
+	   mensaje: String,
+	   cancionId: Long? = null,
+	   detalles: Map<String, String>? = null,
+	   excepcion: Throwable? = null,
    )
 
-   suspend fun logDebug(fase: EstadoProcesoMedia, mensaje: String, cancionId: Long? = null)
+   suspend fun logDebug(fase: MediaProcessingState, mensaje: String, cancionId: Long? = null)
 
-   suspend fun logInfo(fase: EstadoProcesoMedia, mensaje: String, cancionId: Long? = null)
+   suspend fun logInfo(fase: MediaProcessingState, mensaje: String, cancionId: Long? = null, detalles: Map<String, String>? = null)
 
-   suspend fun logWarning(fase: EstadoProcesoMedia, mensaje: String, cancionId: Long? = null)
+   suspend fun logWarning(fase: MediaProcessingState, mensaje: String, cancionId: Long? = null)
 
    suspend fun logError(
-      fase: EstadoProcesoMedia,
-      mensaje: String,
-      cancionId: Long? = null,
-      excepcion: Throwable? = null,
+	   fase: MediaProcessingState,
+	   mensaje: String,
+	   cancionId: Long? = null,
+	   excepcion: Throwable? = null,
    )
 
    // ─────────────────────────────────────────────────────────────
@@ -183,7 +183,7 @@ interface UsuarioRepository {
    // ─────────────────────────────────────────────────────────────
    fun obtenerLogs(limite: Int = 100, nivelMinimo: NivelLog = NivelLog.INFO): Flow<List<LogApp>>
 
-   fun obtenerLogsPorFase(fase: EstadoProcesoMedia, limite: Int = 50): Flow<List<LogApp>>
+   fun obtenerLogsPorFase(fase: MediaProcessingState, limite: Int = 50): Flow<List<LogApp>>
 
    fun obtenerLogsPorCancion(cancionId: Long): Flow<List<LogApp>>
 

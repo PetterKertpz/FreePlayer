@@ -46,7 +46,7 @@
 -keep class androidx.media3.session.** { *; }
 -keep class androidx.media3.ui.** { *; }
 
-# MediaSession service
+# MediaSession strategy
 -keep class * extends androidx.media3.session.MediaSessionService { *; }
 -keep class * extends androidx.media3.session.MediaLibraryService { *; }
 
@@ -149,12 +149,12 @@
 # ─────────────────────────────────────────────────────────────────────────────
 # Ejemplo: mantener entidades de Room y modelos de red
 # -keep class com.tuapp.musicplayer.data.local.entity.** { *; }
-# -keep class com.tuapp.musicplayer.data.remote.dto.** { *; }
+# -keep class com.tuapp.musicplayer.data.remote.entity.** { *; }
 
 # ─────────────────────────────────────────────────────────────────────────────
 # SERVICIOS DE MÚSICA - Mantener servicios en segundo plano
 # ─────────────────────────────────────────────────────────────────────────────
-# -keep class com.tuapp.musicplayer.service.** { *; }
+# -keep class com.tuapp.musicplayer.strategy.** { *; }
 
 # ─────────────────────────────────────────────────────────────────────────────
 # ENUMS

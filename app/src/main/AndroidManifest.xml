@@ -12,7 +12,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.FreePlayer">
         <activity
-            android:name="com.pmk.freeplayer.MainActivity"
+            android:name="com.pmk.freeplayer.app.MainActivity"
             android:exported="true"
             android:theme="@style/Theme.FreePlayer">
             <intent-filter>

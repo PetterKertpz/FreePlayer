@@ -1,14 +1,14 @@
 [versions]
 # --- CORE VERSIONS ---
 accompanistPermissions = "0.37.3"
-agp = "8.13.2"
+agp = "9.0.0"
 desugar_jdk_libs = "2.1.5"
 gson = "2.13.2"
 hiltCompilerVersion = "1.3.0"
 hiltWork = "1.3.0"
 kotlin = "2.3.0"
 kotlinxCoroutinesGuava = "1.10.2"
-ksp = "2.3.1"
+ksp = "2.3.2"
 
 # --- ANDROID & GOOGLE ---
 coreKtx = "1.17.0"

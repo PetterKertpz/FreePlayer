@@ -1,8 +1,9 @@
 package com.pmk.freeplayer.domain.repository
 
-import com.pmk.freeplayer.domain.model.ResultadoEnriquecimiento
-import com.pmk.freeplayer.domain.model.ResultadoEscaneo
-import com.pmk.freeplayer.domain.model.ResultadoLimpieza
+import com.pmk.freeplayer.domain.model.Duracion
+import com.pmk.freeplayer.domain.pipeline.ResultadoEnriquecimiento
+import com.pmk.freeplayer.domain.pipeline.ResultadoEscaneo
+import com.pmk.freeplayer.domain.pipeline.ResultadoLimpieza
 import kotlinx.coroutines.flow.Flow
 
 interface EscaneoRepository {
@@ -33,7 +34,7 @@ interface EscaneoRepository {
 	
 	suspend fun obtenerTotalLetrasObtenidas(): Int
 	
-	suspend fun obtenerTiempoTotalProcesamiento(): Long
+	suspend fun obtenerTiempoTotalProcesamiento(): Duracion
 	
 	// ─────────────────────────────────────────────────────────────
 	// Limpieza
