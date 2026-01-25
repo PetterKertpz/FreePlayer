@@ -1,10 +1,9 @@
 package com.pmk.freeplayer.domain.useCase
 
-import com.pmk.freeplayer.domain.model.EstadisticasEscaneo
+import com.pmk.freeplayer.domain.model.ScanStats
 import com.pmk.freeplayer.domain.pipeline.ResultadoEnriquecimiento
 import com.pmk.freeplayer.domain.pipeline.ResultadoEscaneo
 import com.pmk.freeplayer.domain.pipeline.ResultadoLimpieza
-import com.pmk.freeplayer.domain.repository.EscaneoRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
@@ -84,10 +83,10 @@ class ObtenerUltimoEscaneoUseCase @Inject constructor(private val repository: Es
 class ObtenerEstadisticasEscaneoUseCase
 @Inject
 constructor(private val repository: EscaneoRepository) {
-  suspend operator fun invoke(): Result<EstadisticasEscaneo> {
+  suspend operator fun invoke(): Result<ScanStats> {
     return try {
       val estadisticas =
-          EstadisticasEscaneo(
+          ScanStats(
               totalEscaneos = repository.obtenerTotalEscaneos(),
               totalCancionesEscaneadas = repository.obtenerTotalCancionesEscaneadas(),
               totalCancionesLimpiadas = repository.obtenerTotalCancionesLimpiadas(),

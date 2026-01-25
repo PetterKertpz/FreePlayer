@@ -9,14 +9,19 @@ import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
+import javax.inject.Singleton
 
-// Extensión para crear el archivo de preferencias (como un SharedPreferences moderno)
+// Instancia única del DataStore ligada al contexto de la aplicación
 private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "player_prefs")
 
-class PlayerPreferences @Inject constructor(private val context: Context) {
+@Singleton // ✅ Recomendado: Solo debe haber una instancia de esto
+class PlayerPreferences @Inject constructor(
+	@ApplicationContext private val context: Context // ✅ Seguridad: Usa AppContext para evitar memory leaks
+) {
 	
 	// Definimos las claves (Keys)
 	companion object {
@@ -42,6 +47,7 @@ class PlayerPreferences @Inject constructor(private val context: Context) {
 	
 	// --- GUARDAR DATOS (Funciones suspendidas) ---
 	
+	/** Guarda la última canción y posición al pausar o cerrar */
 	suspend fun saveLastSong(songId: Long, positionMs: Long) {
 		context.dataStore.edit { prefs ->
 			prefs[LAST_PLAYED_SONG_ID] = songId
@@ -53,10 +59,25 @@ class PlayerPreferences @Inject constructor(private val context: Context) {
 		context.dataStore.edit { prefs -> prefs[SHUFFLE_MODE] = isEnabled }
 	}
 	
-	// ... resto de funciones de guardado ...
+	suspend fun setRepeatMode(mode: Int) {
+		context.dataStore.edit { prefs -> prefs[REPEAT_MODE] = mode }
+	}
+	
+	suspend fun setVolume(volume: Float) {
+		context.dataStore.edit { prefs -> prefs[VOLUME] = volume }
+	}
+	
+	suspend fun setPlaybackSpeed(speed: Float) {
+		context.dataStore.edit { prefs -> prefs[PLAYBACK_SPEED] = speed }
+	}
+	
+	// Función útil para resetear todo (ej: cerrar sesión)
+	suspend fun clearState() {
+		context.dataStore.edit { it.clear() }
+	}
 }
 
-// Un modelo simple para transportar los datos (No es una Entity)
+// Modelo de datos simple (DTO)
 data class PlayerState(
 	val lastSongId: Long,
 	val lastPositionMs: Long,

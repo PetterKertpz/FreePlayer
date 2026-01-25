@@ -2,8 +2,7 @@ package com.pmk.freeplayer.domain.useCase
 
 import com.pmk.freeplayer.domain.model.LogApp
 import com.pmk.freeplayer.domain.model.NivelLog
-import com.pmk.freeplayer.domain.model.state.MediaProcessingState
-import com.pmk.freeplayer.domain.repository.UsuarioRepository
+import com.pmk.freeplayer.domain.model.MediaProcessingState
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 

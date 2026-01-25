@@ -1,7 +1,7 @@
 package com.pmk.freeplayer.domain.model
 
-// Asumiendo que AuthType ya lo tienes en /audio o /user
-import com.pmk.freeplayer.domain.model.audio.AuthType
+// Asumiendo que AuthType ya lo tienes en /enums o /user
+import com.pmk.freeplayer.domain.model.enums.AuthType
 
 data class User(
 	val id: Long,

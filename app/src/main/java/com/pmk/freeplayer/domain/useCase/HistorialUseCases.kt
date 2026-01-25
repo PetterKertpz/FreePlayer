@@ -2,7 +2,6 @@ package com.pmk.freeplayer.domain.useCase
 
 import com.pmk.freeplayer.domain.model.Duracion
 import com.pmk.freeplayer.domain.model.HistorialReproduccion
-import com.pmk.freeplayer.domain.repository.UsuarioRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 

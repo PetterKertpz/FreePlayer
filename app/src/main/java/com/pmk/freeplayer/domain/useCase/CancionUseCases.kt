@@ -2,13 +2,12 @@ package com.pmk.freeplayer.domain.useCase
 
 import com.pmk.freeplayer.domain.model.Song
 import com.pmk.freeplayer.domain.model.DatosLimpieza
-import com.pmk.freeplayer.domain.model.EstadisticasBiblioteca
+import com.pmk.freeplayer.domain.model.LibraryStats
 import com.pmk.freeplayer.domain.model.Genre
-import com.pmk.freeplayer.domain.model.audio.EstadoIntegridad
+import com.pmk.freeplayer.domain.model.enums.IntegrityStatus
 import com.pmk.freeplayer.domain.model.config.CriterioOrdenamiento
 import com.pmk.freeplayer.domain.model.config.DireccionOrdenamiento
 import com.pmk.freeplayer.domain.model.config.Ordenamiento
-import com.pmk.freeplayer.domain.repository.BibliotecaRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 import javax.inject.Inject
@@ -171,7 +170,7 @@ class ActualizarUltimaReproduccionUseCase @Inject constructor(
 class ObtenerCancionesPorEstadoUseCase @Inject constructor(
 	private val repository: BibliotecaRepository
 ) {
-	operator fun invoke(estado: EstadoIntegridad): Flow<List<Song>> =
+	operator fun invoke(estado: IntegrityStatus): Flow<List<Song>> =
 		repository.obtenerCancionesPorEstado(estado)
 }
 
@@ -196,7 +195,7 @@ class ObtenerCancionesEnriquecidasUseCase @Inject constructor(
 class ContarPorEstadoUseCase @Inject constructor(
 	private val repository: BibliotecaRepository
 ) {
-	suspend operator fun invoke(estado: EstadoIntegridad): Result<Int> {
+	suspend operator fun invoke(estado: IntegrityStatus): Result<Int> {
 		return try {
 			Result.success(repository.contarCancionesPorEstado(estado))
 		} catch (e: Exception) {
@@ -356,7 +355,7 @@ class ObtenerCantidadTotalUseCase @Inject constructor(
 class ObtenerEstadisticasBibliotecaUseCase @Inject constructor(
 	private val repository: BibliotecaRepository
 ) {
-	suspend operator fun invoke(): Result<EstadisticasBiblioteca> {
+	suspend operator fun invoke(): Result<LibraryStats> {
 		return try {
 			Result.success(repository.obtenerEstadisticasBiblioteca())
 		} catch (e: Exception) {

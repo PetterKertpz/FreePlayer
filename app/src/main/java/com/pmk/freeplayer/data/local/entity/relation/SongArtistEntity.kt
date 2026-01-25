@@ -1,38 +1,40 @@
 package com.pmk.freeplayer.data.local.entity.relation
 
-import androidx.room.ColumnInfo
-import androidx.room.Entity
-import androidx.room.ForeignKey
-import androidx.room.Index
+import androidx.room.Embedded
+import androidx.room.Relation
+import com.pmk.freeplayer.data.local.entity.AlbumEntity
 import com.pmk.freeplayer.data.local.entity.ArtistEntity
 import com.pmk.freeplayer.data.local.entity.SongEntity
 
-@Entity(
-	tableName = "song_artists",
-	primaryKeys = ["song_id", "artist_id"], // Clave compuesta: Evita duplicados exactos
-	foreignKeys = [
-		ForeignKey(
-			entity = SongEntity::class,
-			parentColumns = ["song_id"],
-			childColumns = ["song_id"],
-			onDelete = ForeignKey.CASCADE
-		),
-		ForeignKey(
-			entity = ArtistEntity::class,
-			parentColumns = ["artist_id"],
-			childColumns = ["artist_id"],
-			onDelete = ForeignKey.CASCADE
-		)
-	],
-	indices = [
-		Index(value = ["song_id"]),
-		Index(value = ["artist_id"]) // Vital para: "Dame todas las canciones donde aparece Bad Bunny"
-	]
-)
+/**
+ * 📦 POJO DE RELACIÓN: Canción + Artista + Álbum
+ * Usado por SongDao y SongMapper.
+ */
 data class SongArtistEntity(
-	@ColumnInfo(name = "song_id") val songId: Long,
-	@ColumnInfo(name = "artist_id") val artistId: Long,
+	// La entidad base (Canción)
+	@Embedded val song: SongEntity,
 	
-	// "MAIN", "FEATURED", "REMIXER", "PRODUCER", "COMPOSER"
-	@ColumnInfo(name = "role") val role: String = "MAIN"
-)
+	// Relación 1:1 -> Una canción tiene UN artista principal
+	@Relation(
+		parentColumn = "artist_id",
+		entityColumn = "artist_id"
+	)
+	val artist: ArtistEntity?,
+	
+	// Relación 1:1 -> Una canción pertenece a UN álbum
+	@Relation(
+		parentColumn = "album_id",
+		entityColumn = "album_id"
+	)
+	val album: AlbumEntity?
+) {
+	//Helpers para que tu Mapper funcione sin cambios (usando nombres en español/inglés mixtos si es necesario)
+	val artistaNombre: String?
+		get() = artist?.name
+	
+	val albumNombre: String?
+		get() = album?.title
+	
+	val portadaPath: String?
+		get() = album?.localCoverPath ?: album?.remoteCoverUrl
+}

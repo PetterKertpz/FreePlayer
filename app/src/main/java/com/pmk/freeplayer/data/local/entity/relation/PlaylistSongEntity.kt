@@ -1,43 +1,22 @@
 package com.pmk.freeplayer.data.local.entity.relation
 
-import androidx.room.ColumnInfo
-import androidx.room.Entity
-import androidx.room.ForeignKey
-import androidx.room.Index
-import androidx.room.PrimaryKey
+import androidx.room.Embedded
+import androidx.room.Junction
+import androidx.room.Relation
 import com.pmk.freeplayer.data.local.entity.PlaylistEntity
 import com.pmk.freeplayer.data.local.entity.SongEntity
 
-@Entity(
-	tableName = "playlist_songs",
-	foreignKeys = [
-		ForeignKey(
-			entity = PlaylistEntity::class,
-			parentColumns = ["playlist_id"],
-			childColumns = ["playlist_id"],
-			onDelete = ForeignKey.CASCADE // Si borras la playlist, se borran las relaciones
-		),
-		ForeignKey(
-			entity = SongEntity::class,
-			parentColumns = ["song_id"],
-			childColumns = ["song_id"],
-			onDelete = ForeignKey.CASCADE // Si borras la canción de la biblioteca, desaparece de las playlists
-		)
-	],
-	indices = [
-		Index(value = ["playlist_id", "sort_order"]), // Para cargar la lista ordenada
-		Index(value = ["song_id"]) // Para saber en qué playlists está una canción
-	]
-)
+/**
+ * 📦 POJO DE RELACIÓN MUCHOS-A-MUCHOS: Playlist + Canciones
+ * Usa la tabla 'playlist_song_join' (PlaylistSongEntity) para unir.
+ */
 data class PlaylistSongEntity(
-	@PrimaryKey(autoGenerate = true)
-	@ColumnInfo(name = "id") val id: Long = 0,
+	@Embedded val playlist: PlaylistEntity,
 	
-	@ColumnInfo(name = "playlist_id") val playlistId: Long,
-	@ColumnInfo(name = "song_id") val songId: Long,
-	
-	// El orden específico dentro de ESTA playlist (0, 1, 2...)
-	@ColumnInfo(name = "sort_order") val sortOrder: Int,
-	
-	@ColumnInfo(name = "added_at") val addedAt: Long = System.currentTimeMillis()
+	@Relation(
+		parentColumn = "playlist_id",
+		entityColumn = "song_id",
+		associateBy = Junction(PlaylistSongEntity::class)
+	)
+	val songs: List<SongEntity>
 )

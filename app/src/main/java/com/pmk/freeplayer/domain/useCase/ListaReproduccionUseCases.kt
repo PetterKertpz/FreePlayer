@@ -2,8 +2,6 @@ package com.pmk.freeplayer.domain.useCase.playlist
 
 import com.pmk.freeplayer.domain.model.Song
 import com.pmk.freeplayer.domain.model.ListaReproduccion
-import com.pmk.freeplayer.domain.repository.BibliotecaRepository
-import com.pmk.freeplayer.domain.repository.ReproductorRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.first

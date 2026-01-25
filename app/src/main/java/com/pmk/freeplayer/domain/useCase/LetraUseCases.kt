@@ -2,8 +2,7 @@ package com.pmk.freeplayer.domain.useCase
 
 import com.pmk.freeplayer.domain.model.Song
 import com.pmk.freeplayer.domain.model.LetraCancion
-import com.pmk.freeplayer.domain.model.audio.EstadoLetra
-import com.pmk.freeplayer.domain.repository.GeniusRepository
+import com.pmk.freeplayer.domain.model.enums.LetterStatus
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
@@ -33,7 +32,7 @@ constructor(private val repository: GeniusRepository) {
 }
 
 class ContarPorEstadoLetraUseCase @Inject constructor(private val repository: GeniusRepository) {
-   suspend operator fun invoke(estado: EstadoLetra): Result<Int> {
+   suspend operator fun invoke(estado: LetterStatus): Result<Int> {
       return try {
          Result.success(repository.contarPorEstadoLetra(estado))
       } catch (e: Exception) {
@@ -98,7 +97,7 @@ class EliminarLetraUseCase @Inject constructor(private val repository: GeniusRep
 }
 
 class ActualizarEstadoLetraUseCase @Inject constructor(private val repository: GeniusRepository) {
-   suspend operator fun invoke(cancionId: Long, estado: EstadoLetra): Result<Unit> {
+   suspend operator fun invoke(cancionId: Long, estado: LetterStatus): Result<Unit> {
       return try {
          repository.actualizarEstadoLetra(cancionId, estado)
          Result.success(Unit)
@@ -146,14 +145,14 @@ class ObtenerLetraCompletaUseCase @Inject constructor(
 		return try {
 			// 1. Buscar archivo .lrc local primero (sincronizada)
 			val letraLocal = repository.buscarArchivoLrcLocal(song.ruta)
-			if (letraLocal != null && letraLocal.estado == EstadoLetra.ENCONTRADA_LOCAL) {
+			if (letraLocal != null && letraLocal.estado == LetterStatus.ENCONTRADA_LOCAL) {
 				repository.guardarLetra(letraLocal)
 				return letraLocal
 			}
 			
 			// 2. Buscar en línea
 			val letraOnline = repository.buscarLetraEnLinea(song.titulo, song.artista)
-			if (letraOnline != null && letraOnline.estado == EstadoLetra.ENCONTRADA_ONLINE) {
+			if (letraOnline != null && letraOnline.estado == LetterStatus.ENCONTRADA_ONLINE) {
 				repository.guardarLetra(letraOnline)
 				return letraOnline
 			}
@@ -161,7 +160,7 @@ class ObtenerLetraCompletaUseCase @Inject constructor(
 			// 3. No encontrada - guardar estado
 			val letraNoEncontrada = LetraCancion(
 				cancionId = song.id,
-				estado = EstadoLetra.NO_ENCONTRADA,
+				estado = LetterStatus.NO_ENCONTRADA,
 				contenido = null,
 				lineasSincronizadas = null,
 				idioma = null
@@ -173,7 +172,7 @@ class ObtenerLetraCompletaUseCase @Inject constructor(
 			// Retornar LetraCancion con estado de error
 			LetraCancion(
 				cancionId = song.id,
-				estado = EstadoLetra.NO_ENCONTRADA,
+				estado = LetterStatus.NO_ENCONTRADA,
 				contenido = null,
 				lineasSincronizadas = null,
 				idioma = null

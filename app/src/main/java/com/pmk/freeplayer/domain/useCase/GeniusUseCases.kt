@@ -3,7 +3,6 @@ package com.pmk.freeplayer.domain.useCase
 import com.pmk.freeplayer.domain.model.Song
 import com.pmk.freeplayer.domain.model.Genius
 import com.pmk.freeplayer.domain.pipeline.ResultadoComparacion
-import com.pmk.freeplayer.domain.repository.GeniusRepository
 import com.pmk.freeplayer.domain.strategy.SongMatchingStrategy
 import javax.inject.Inject
 

@@ -1,13 +1,10 @@
 package com.pmk.freeplayer.domain.useCase
 
 import com.pmk.freeplayer.domain.model.Song
-import com.pmk.freeplayer.domain.model.ColaReproduccion
+import com.pmk.freeplayer.domain.model.Queue
 import com.pmk.freeplayer.domain.model.Duracion
 import com.pmk.freeplayer.domain.model.Genre
-import com.pmk.freeplayer.domain.model.state.MediaProcessingState
-import com.pmk.freeplayer.domain.repository.BibliotecaRepository
-import com.pmk.freeplayer.domain.repository.ReproductorRepository
-import com.pmk.freeplayer.domain.repository.UsuarioRepository
+import com.pmk.freeplayer.domain.model.MediaProcessingState
 import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 
@@ -110,7 +107,7 @@ constructor(
 	   canciones: List<Song>,
 	   indiceInicial: Int = 0,
 	   mezclar: Boolean = false,
-   ): Result<ColaReproduccion> {
+   ): Result<Queue> {
       return try {
          require(canciones.isNotEmpty()) { "La lista de canciones está vacía" }
          require(indiceInicial in canciones.indices) { "Índice inicial inválido" }
@@ -146,7 +143,7 @@ constructor(
          )
 
          val cola =
-            ColaReproduccion(canciones = listaFinal, indiceActual = if (mezclar) 0 else nuevoIndice)
+            Queue(canciones = listaFinal, indiceActual = if (mezclar) 0 else nuevoIndice)
 
          // Actualizar estadísticas de la primera canción
          val primeraCancion = listaFinal.first()
@@ -309,7 +306,7 @@ constructor(
 // 🔊 GESTIÓN DE AUDIO
 // ════════════════════════════════════════════════════════════
 
-/** Valida calidad de audio y sugiere mejoras */
+/** Valida calidad de enums y sugiere mejoras */
 class AnalizarCalidadAudioUseCase
 @Inject
 constructor(private val bibliotecaRepo: BibliotecaRepository) {
@@ -367,7 +364,7 @@ constructor(
    private val usuarioRepo: UsuarioRepository,
    private val reproductorRepo: ReproductorRepository,
 ) {
-   suspend operator fun invoke(criterios: CriteriosColaInteligente): Result<ColaReproduccion> {
+   suspend operator fun invoke(criterios: CriteriosColaInteligente): Result<Queue> {
       return try {
          val candidatas = mutableListOf<Song>()
 
@@ -402,7 +399,7 @@ constructor(
          // 5. Crear cola
          reproductorRepo.establecerCola(canciones = cancionesFinales, indiceInicial = 0)
 
-         val cola = ColaReproduccion(canciones = cancionesFinales, indiceActual = 0)
+         val cola = Queue(canciones = cancionesFinales, indiceActual = 0)
 
          usuarioRepo.logInfo(
             fase = MediaProcessingState.Inactivo,
@@ -458,7 +455,7 @@ data class CriteriosColaInteligente(
 // 🛠️ UTILIDADES
 // ════════════════════════════════════════════════════════════
 
-/** Validador de archivos de audio - debe implementarse en capa de infraestructura */
+/** Validador de archivos de enums - debe implementarse en capa de infraestructura */
 interface ValidadorArchivosAudio {
    suspend fun validar(ruta: String): ResultadoValidacion
 

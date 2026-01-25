@@ -1,6 +1,6 @@
 package com.pmk.freeplayer.domain.model
 
-import com.pmk.freeplayer.domain.model.audio.LyricsStatus
+import com.pmk.freeplayer.domain.model.enums.LyricsStatus
 
 data class Lyrics(
 	val id: Long,
@@ -15,7 +15,7 @@ data class Lyrics(
 	val url: String?,
 	val language: String?,
 	
-	// Estado (Tu enum EstadoLetra es útil para la UI de carga)
+	// Estado (Tu enum LetterStatus es útil para la UI de carga)
 	val status: LyricsStatus = LyricsStatus.FOUND
 ) {
 	// Helper para saber si activamos la vista de Karaoke
