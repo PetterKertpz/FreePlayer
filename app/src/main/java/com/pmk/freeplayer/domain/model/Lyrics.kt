@@ -6,23 +6,70 @@ data class Lyrics(
 	val id: Long,
 	val songId: Long,
 	
-	// Contenido
-	val plainText: String,    // Siempre debe haber algo aquí (aunque sea el LRC sucio)
-	val syncedText: String?,  // El string LRC crudo ("[00:12.50] Hola...")
+	// ═══════════════════════════════════════════════════════════════
+	// CONTENT
+	// ═══════════════════════════════════════════════════════════════
+	val plainText: String,    // Always has content (even if raw LRC)
+	val syncedText: String?,  // Raw LRC string "[00:12.50] Hello..."
 	
-	// Metadatos
-	val source: String,
-	val url: String?,
-	val language: String?,
+	// ═══════════════════════════════════════════════════════════════
+	// METADATA
+	// ═══════════════════════════════════════════════════════════════
+	val sourceUrl: String?,   // Where it was found (Genius URL, etc.)
+	val language: String?,    // ISO code: "en", "es", etc.
 	
-	// Estado (Tu enum LetterStatus es útil para la UI de carga)
-	val status: LyricsStatus = LyricsStatus.FOUND
+	// ═══════════════════════════════════════════════════════════════
+	// STATUS (Using unified LyricsStatus)
+	// ═══════════════════════════════════════════════════════════════
+	val status: LyricsStatus = LyricsStatus.FOUND_ONLINE
 ) {
-	// Helper para saber si activamos la vista de Karaoke
+	/**
+	 * True if lyrics have timing info for karaoke mode
+	 */
 	val isSynced: Boolean
 		get() = !syncedText.isNullOrBlank()
 	
-	// Helper para parsear LRC a objetos (se puede mover a un UseCase si es complejo)
-	// Pero tenerlo aquí es práctico para validaciones rápidas.
+	/**
+	 * True if we have any lyrics content
+	 */
+	val hasContent: Boolean
+		get() = plainText.isNotBlank()
+	
+	/**
+	 * Source display name for UI
+	 */
+	val sourceDisplayName: String
+		get() = when (status) {
+			LyricsStatus.FOUND_EMBEDDED -> "Embedded"
+			LyricsStatus.FOUND_LOCAL -> "Local file"
+			LyricsStatus.FOUND_ONLINE -> sourceUrl?.extractDomain() ?: "Online"
+			else -> "Unknown"
+		}
+	
+	companion object {
+		/**
+		 * Empty lyrics object for when none are found
+		 */
+		fun empty(songId: Long) = Lyrics(
+			id = 0,
+			songId = songId,
+			plainText = "",
+			syncedText = null,
+			sourceUrl = null,
+			language = null,
+			status = LyricsStatus.NOT_FOUND
+		)
+	}
 }
 
+/**
+ * Extract domain from URL for display
+ */
+private fun String.extractDomain(): String? {
+	return try {
+		val withoutProtocol = removePrefix("https://").removePrefix("http://")
+		withoutProtocol.substringBefore("/").substringBefore("?")
+	} catch (e: Exception) {
+		null
+	}
+}

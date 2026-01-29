@@ -1,5 +1,7 @@
 package com.pmk.freeplayer.domain.model
 
+import com.pmk.freeplayer.domain.model.enums.IntegrityStatus
+
 data class Song(
 	val id: Long,
 	val title: String,
@@ -46,36 +48,9 @@ data class Song(
 	val playCount: Int,
 	val rating: Float,
 	val hasLyrics: Boolean,
-	val metadataStatus: String // "PENDING", "VERIFIED"
+	val metadataStatus: IntegrityStatus
 ) {
 	val featuringArtists: List<String> = emptyList()
-	// ==================== HELPERS PARA UI ====================
-	// Lógica de presentación directamente en el modelo
-	
-	/**
-	 * Devuelve la extensión del archivo en mayúsculas. Ej: "MP3", "FLAC"
-	 */
-	val fileExtension: String
-		get() = filePath.substringAfterLast('.', "").uppercase()
-	
-	/**
-	 * Genera una etiqueta de calidad bonita.
-	 * Ej: "FLAC • 44.1kHz" o "MP3 • 320kbps"
-	 */
-	val qualityLabel: String
-		get() {
-			val parts = mutableListOf<String>()
-			parts.add(fileExtension)
-			
-			if (bitrate != null && bitrate > 0) {
-				parts.add("${bitrate}kbps")
-			}
-			// Solo mostramos Hz si es alta calidad para no saturar
-			if (sampleRate != null && sampleRate > 48000) {
-				parts.add("${sampleRate / 1000}kHz")
-			}
-			return parts.joinToString(" • ")
-		}
 	
 	/**
 	 * Verifica si la canción ha sido editada por el usuario

@@ -6,23 +6,28 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.pmk.freeplayer.data.local.dao.AlbumDao
 import com.pmk.freeplayer.data.local.dao.ArtistDao
+import com.pmk.freeplayer.data.local.dao.EnrichmentResultDao
 import com.pmk.freeplayer.data.local.dao.GenreDao
+import com.pmk.freeplayer.data.local.dao.LyricsDao
+import com.pmk.freeplayer.data.local.dao.PlaybackHistoryDao
 import com.pmk.freeplayer.data.local.dao.PlaylistDao
 import com.pmk.freeplayer.data.local.dao.QueueDao
+import com.pmk.freeplayer.data.local.dao.ScannerDao
 import com.pmk.freeplayer.data.local.dao.SongDao
 import com.pmk.freeplayer.data.local.dao.UserDao
 import com.pmk.freeplayer.data.local.entity.AlbumEntity
 import com.pmk.freeplayer.data.local.entity.ArtistEntity
-import com.pmk.freeplayer.data.local.entity.ArtistSocialLinkEntity
+import com.pmk.freeplayer.data.local.entity.CleaningResultEntity
+import com.pmk.freeplayer.data.local.entity.EnrichmentResultEntity
 import com.pmk.freeplayer.data.local.entity.GenreEntity
 import com.pmk.freeplayer.data.local.entity.LyricsEntity
 import com.pmk.freeplayer.data.local.entity.PlaybackHistoryEntity
 import com.pmk.freeplayer.data.local.entity.PlaylistEntity
 import com.pmk.freeplayer.data.local.entity.QueueEntity
+import com.pmk.freeplayer.data.local.entity.ScanResultEntity
 import com.pmk.freeplayer.data.local.entity.SongEntity
 import com.pmk.freeplayer.data.local.entity.UserEntity
-import com.pmk.freeplayer.data.local.entity.relation.PlaylistSongEntity
-import com.pmk.freeplayer.data.local.entity.relation.SongArtistEntity
+import com.pmk.freeplayer.data.local.entity.relation.PlaylistSongJoin
 
 @Database(
    entities =
@@ -33,7 +38,9 @@ import com.pmk.freeplayer.data.local.entity.relation.SongArtistEntity
          AlbumEntity::class,
          ArtistEntity::class,
          GenreEntity::class,
-
+         ScanResultEntity::class,
+         CleaningResultEntity::class,
+         EnrichmentResultEntity::class,
          // ==================== ORGANIZACIÓN ====================
          PlaylistEntity::class,
          QueueEntity::class, // La versión ligera que hicimos
@@ -41,17 +48,15 @@ import com.pmk.freeplayer.data.local.entity.relation.SongArtistEntity
 
          // ==================== DETALLES ====================
          LyricsEntity::class,
-         ArtistSocialLinkEntity::class,
 
          // ==================== TABLAS INTERMEDIAS (RELACIONES N:M) ====================
          // Estas son vitales para Room
-         PlaylistSongEntity::class, // Canciones dentro de Playlist
-         SongArtistEntity::class, // Feat. Artists (Queen & Bowie)
+         PlaylistSongJoin::class,
       ],
    version = 1, // Reiniciamos a 1 porque cambiamos todo el esquema
    exportSchema = false,
 )
-@TypeConverters(TypeConverters::class)
+@TypeConverters(Converts::class)
 abstract class AppDatabase : RoomDatabase() {
 
    // ==================== DAOs ====================
@@ -67,14 +72,18 @@ abstract class AppDatabase : RoomDatabase() {
    abstract fun genreDao(): GenreDao
 
    abstract fun playlistDao(): PlaylistDao
+	
+	abstract fun lyricsDao(): LyricsDao
+	
+	abstract fun enrichmentResultDao(): EnrichmentResultDao
+
+	abstract fun playbackHistoryDao(): PlaybackHistoryDao
+
+   abstract fun scannerDao(): ScannerDao
 
    abstract fun queueDao(): QueueDao // Antes PlaybackQueueDao
 
-   abstract fun historyDao(): ArtistDao // (Debes crear HistoryDao, usé ArtistDao de placeholder)
-
-   // Nota: ArtistSocialLink y Lyrics se suelen acceder a través de
-   // ArtistDao y SongDao respectivamente, o puedes crear sus propios DAOs si prefieres.
-
+   
    companion object {
       const val DATABASE_NAME = "freeplayer_db"
    }

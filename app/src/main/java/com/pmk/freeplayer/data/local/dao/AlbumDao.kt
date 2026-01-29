@@ -8,124 +8,135 @@ import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
 import com.pmk.freeplayer.data.local.entity.AlbumEntity
+import com.pmk.freeplayer.data.local.entity.relation.AlbumArtistEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface AlbumDao {
-	
-	// ==================== INSERTS ====================
-	
-	@Insert(onConflict = OnConflictStrategy.REPLACE)
-	suspend fun insert(album: AlbumEntity): Long
-	
-	@Insert(onConflict = OnConflictStrategy.REPLACE)
-	suspend fun insertAll(albums: List<AlbumEntity>)
-	
-	// ==================== UPDATES & DELETES ====================
-	
-	@Update
-	suspend fun update(album: AlbumEntity)
-	
-	@Delete
-	suspend fun delete(album: AlbumEntity)
-	
-	@Query("DELETE FROM albums WHERE album_id = :albumId")
-	suspend fun deleteById(albumId: Long)
-	
-	// Limpieza de álbumes vacíos (fantasmas)
-	@Query("DELETE FROM albums WHERE total_songs = 0")
-	suspend fun deleteEmptyAlbums()
-	
-	// ==================== QUERIES BÁSICAS ====================
-	
-	@Query("SELECT * FROM albums WHERE album_id = :albumId")
-	fun getAlbumById(albumId: Long): Flow<AlbumEntity?>
-	
-	// Versión suspendida para uso interno (Scanners, Workers)
-	@Query("SELECT * FROM albums WHERE album_id = :albumId LIMIT 1")
-	suspend fun getAlbumByIdSync(albumId: Long): AlbumEntity?
-	
-	@Query("SELECT * FROM albums ORDER BY title ASC")
-	fun getAllAlbums(): Flow<List<AlbumEntity>>
-	
-	// ==================== FILTROS ====================
-	
-	@Query("SELECT * FROM albums WHERE artist_id = :artistId ORDER BY year DESC")
-	fun getAlbumsByArtist(artistId: Long): Flow<List<AlbumEntity>>
-	
-	@Query("SELECT * FROM albums WHERE year = :year ORDER BY title ASC")
-	fun getAlbumsByYear(year: Int): Flow<List<AlbumEntity>>
-	
-	// Búsqueda inteligente (Title Match > Partial Match)
-	@Query("""
-        SELECT * FROM albums
-        WHERE title LIKE '%' || :query || '%'
-        ORDER BY
-            CASE WHEN title LIKE :query || '%' THEN 1 ELSE 2 END,
-            title ASC
-    """)
-	fun searchAlbums(query: String): Flow<List<AlbumEntity>>
-	
-	// ==================== RANKINGS & HOME ====================
-	
-	@Query("SELECT * FROM albums ORDER BY date_added DESC LIMIT :limit")
-	fun getRecentAlbums(limit: Int = 20): Flow<List<AlbumEntity>>
-	
-	@Query("SELECT * FROM albums ORDER BY play_count DESC LIMIT :limit")
-	fun getMostPlayedAlbums(limit: Int = 20): Flow<List<AlbumEntity>>
-	
-	// ==================== LOGICA DE NEGOCIO (Estadísticas) ====================
-	
-	/**
-	 * Recalcula los contadores basándose en la tabla 'songs'.
-	 * CRÍTICO: Asume que la tabla se llama 'songs' y tiene 'album_id' y 'duration'.
-	 */
-	@Query("""
-        UPDATE albums
-        SET total_songs = (SELECT COUNT(*) FROM songs WHERE songs.album_id = albums.album_id),
+
+   // ==================== BASE JOIN QUERY ====================
+   companion object {
+      private const val SELECT_WITH_ARTIST =
+         """
+            SELECT 
+                a.album_id, a.title, a.artist_id,
+                ar.name AS artist_name,
+                a.cover_path, a.cover_url, a.album_type, a.genres,
+                a.year, a.date_added, a.description, a.producer,
+                a.record_label, a.total_songs, a.total_duration_ms,
+                a.play_count, a.rating_average, a.is_favorite,
+                a.genius_id, a.spotify_id
+            FROM albums a
+            INNER JOIN artists ar ON a.artist_id = ar.artist_id
+        """
+   }
+
+   // ==================== INSERTS ====================
+
+   @Insert(onConflict = OnConflictStrategy.REPLACE) suspend fun insert(album: AlbumEntity): Long
+
+   @Insert(onConflict = OnConflictStrategy.REPLACE) suspend fun insertAll(albums: List<AlbumEntity>)
+
+   // ==================== UPDATES & DELETES ====================
+
+   @Update suspend fun update(album: AlbumEntity)
+
+   @Delete suspend fun delete(album: AlbumEntity)
+
+   @Query("DELETE FROM albums WHERE album_id = :albumId") suspend fun deleteById(albumId: Long)
+
+   @Query("DELETE FROM albums WHERE total_songs = 0") suspend fun deleteEmptyAlbums()
+
+   // ==================== QUERIES CON JOIN ====================
+
+   @Query("$SELECT_WITH_ARTIST WHERE a.album_id = :albumId")
+   fun getAlbumById(albumId: Long): Flow<AlbumArtistEntity?>
+
+   @Query("$SELECT_WITH_ARTIST ORDER BY a.title COLLATE NOCASE ASC")
+   fun getAllAlbums(): Flow<List<AlbumArtistEntity>>
+
+   @Query("$SELECT_WITH_ARTIST WHERE a.artist_id = :artistId ORDER BY a.year DESC")
+   fun getAlbumsByArtistId(artistId: Long): Flow<List<AlbumArtistEntity>>
+
+   @Query("$SELECT_WITH_ARTIST WHERE ar.name LIKE '%' || :artistName || '%' ORDER BY a.year DESC")
+   fun getAlbumsByArtistName(artistName: String): Flow<List<AlbumArtistEntity>>
+
+   @Query(
+      """
+        $SELECT_WITH_ARTIST 
+        WHERE a.title LIKE '%' || :query || '%' OR ar.name LIKE '%' || :query || '%'
+        ORDER BY 
+            CASE WHEN a.title LIKE :query || '%' THEN 0 ELSE 1 END,
+            a.title COLLATE NOCASE ASC
+    """
+   )
+   fun searchAlbums(query: String): Flow<List<AlbumArtistEntity>>
+
+   // ==================== SORTED QUERIES ====================
+
+   @Query("$SELECT_WITH_ARTIST ORDER BY a.title COLLATE NOCASE ASC")
+   fun getAllSortedByTitleAsc(): Flow<List<AlbumArtistEntity>>
+
+   @Query("$SELECT_WITH_ARTIST ORDER BY a.title COLLATE NOCASE DESC")
+   fun getAllSortedByTitleDesc(): Flow<List<AlbumArtistEntity>>
+
+   @Query("$SELECT_WITH_ARTIST ORDER BY ar.name COLLATE NOCASE ASC, a.year DESC")
+   fun getAllSortedByArtistAsc(): Flow<List<AlbumArtistEntity>>
+
+   @Query("$SELECT_WITH_ARTIST ORDER BY ar.name COLLATE NOCASE DESC, a.year DESC")
+   fun getAllSortedByArtistDesc(): Flow<List<AlbumArtistEntity>>
+
+   // 1. Nulos al final en orden Descendente (2025, 2024... null)
+   @Query("$SELECT_WITH_ARTIST ORDER BY CASE WHEN a.year IS NULL THEN 1 ELSE 0 END, a.year DESC")
+   fun getAllSortedByYearDesc(): Flow<List<AlbumArtistEntity>>
+
+   // 2. Nulos al final en orden Ascendente (1990, 1991... null)
+   @Query("$SELECT_WITH_ARTIST ORDER BY CASE WHEN a.year IS NULL THEN 1 ELSE 0 END, a.year ASC")
+   fun getAllSortedByYearAsc(): Flow<List<AlbumArtistEntity>>
+
+   @Query("$SELECT_WITH_ARTIST ORDER BY a.date_added DESC")
+   fun getAllSortedByDateAddedDesc(): Flow<List<AlbumArtistEntity>>
+
+   @Query("$SELECT_WITH_ARTIST ORDER BY a.date_added ASC")
+   fun getAllSortedByDateAddedAsc(): Flow<List<AlbumArtistEntity>>
+
+   @Query("$SELECT_WITH_ARTIST ORDER BY a.play_count DESC")
+   fun getAllSortedByPlayCountDesc(): Flow<List<AlbumArtistEntity>>
+
+   @Query("$SELECT_WITH_ARTIST ORDER BY a.play_count ASC")
+   fun getAllSortedByPlayCountAsc(): Flow<List<AlbumArtistEntity>>
+
+   @Query("$SELECT_WITH_ARTIST ORDER BY a.total_duration_ms DESC")
+   fun getAllSortedByDurationDesc(): Flow<List<AlbumArtistEntity>>
+
+   @Query("$SELECT_WITH_ARTIST ORDER BY a.total_duration_ms ASC")
+   fun getAllSortedByDurationAsc(): Flow<List<AlbumArtistEntity>>
+
+   // ==================== STATS ====================
+
+   @Query("SELECT COUNT(*) FROM albums") suspend fun getTotalCount(): Int
+
+   @Query("UPDATE albums SET play_count = play_count + 1 WHERE album_id = :albumId")
+   suspend fun incrementPlayCount(albumId: Long)
+
+   @Query(
+      """
+        UPDATE albums SET 
+            total_songs = (SELECT COUNT(*) FROM songs WHERE songs.album_id = albums.album_id),
             total_duration_ms = (SELECT COALESCE(SUM(duration), 0) FROM songs WHERE songs.album_id = albums.album_id)
         WHERE album_id = :albumId
-    """)
-	suspend fun refreshAlbumStats(albumId: Long)
-	
-	@Query("UPDATE albums SET play_count = play_count + 1 WHERE album_id = :albumId")
-	suspend fun incrementPlayCount(albumId: Long)
-	
-	// ==================== HELPERS PARA SCANNER ====================
-	// Estos métodos ayudan a evitar duplicados al escanear la biblioteca
-	
-	@Query("SELECT * FROM albums WHERE title = :title AND artist_id = :artistId LIMIT 1")
-	suspend fun findAlbumByTitleAndArtist(title: String, artistId: Long): AlbumEntity?
-	
-	/**
-	 * Método transaccional inteligente:
-	 * Busca el álbum. Si existe, devuelve el ID existente.
-	 * Si no existe, lo crea y devuelve el nuevo ID.
-	 */
-	@Transaction
-	suspend fun getOrCreateAlbumId(title: String, artistId: Long, year: Int?): Long {
-		val existing = findAlbumByTitleAndArtist(title, artistId)
-		return if (existing != null) {
-			existing.albumId
-		} else {
-			val newAlbum = AlbumEntity(
-				title = title,
-				artistId = artistId,
-				year = year,
-				dateAdded = System.currentTimeMillis()
-			)
-			insert(newAlbum)
-		}
-	}
-	
-	// ==================== DASHBOARD STATS ====================
-	
-	@Query("SELECT year, COUNT(*) as count FROM albums WHERE year IS NOT NULL GROUP BY year ORDER BY year DESC")
-	suspend fun getAlbumsCountByYear(): List<AlbumYearStats>
-}
+    """
+   )
+   suspend fun refreshAlbumStats(albumId: Long)
 
-// DTO Auxiliar para el resultado de la query getAlbumsCountByYear
-data class AlbumYearStats(
-	val year: Int,
-	val count: Int
-)
+   // ==================== SCANNER HELPERS ====================
+
+   @Query("SELECT * FROM albums WHERE title = :title AND artist_id = :artistId LIMIT 1")
+   suspend fun findByTitleAndArtist(title: String, artistId: Long): AlbumEntity?
+
+   @Transaction
+   suspend fun getOrCreateAlbumId(title: String, artistId: Long, year: Int?): Long {
+      return findByTitleAndArtist(title, artistId)?.albumId
+         ?: insert(AlbumEntity(title = title, artistId = artistId, year = year))
+   }
+}

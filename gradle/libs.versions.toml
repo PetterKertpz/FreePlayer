@@ -3,7 +3,7 @@
 accompanistPermissions = "0.37.3"
 agp = "9.0.0"
 desugar_jdk_libs = "2.1.5"
-gson = "2.13.2"
+gson = "3.0.0"
 hiltCompilerVersion = "1.3.0"
 hiltWork = "1.3.0"
 kotlin = "2.3.0"
@@ -17,7 +17,7 @@ activityCompose = "1.12.2"
 composeBom = "2026.01.00"
 room = "2.8.4"
 navigationCompose = "2.9.6"
-hilt = "2.58"
+hilt = "2.59"
 hiltNavigationCompose = "1.3.0"
 googleGmsPlugin = "4.4.4"
 constraintlayoutCompose = "1.1.1"
@@ -39,11 +39,12 @@ datastorePreferences = "1.2.0"
 
 # --- UI & MEDIA ---
 coilCompose = "2.7.0"
-media3 = "1.9.0"
+media3 = "1.9.1"
 bcrypt = "0.10.2"
 composeIcons = "1.1.1"
 
 # --- WORK ---
+symbolProcessingGradlePlugin = "KSP_VERSION"
 workRuntimeKtx = "2.11.0"
 
 # --- TESTING ---
@@ -124,7 +125,7 @@ moshi-kotlin = { group = "com.squareup.moshi", name = "moshi-kotlin", version.re
 okhttp-logging-interceptor = { group = "com.squareup.okhttp3", name = "logging-interceptor", version.ref = "okhttp" }
 
 # --- Other Tools ---
-gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
+retrofit-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "gson" }
 coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose" }
 jsoup = { group = "org.jsoup", name = "jsoup", version.ref = "jsoup" }
 bcrypt = { group = "at.favre.lib", name = "bcrypt", version.ref = "bcrypt" }
@@ -137,16 +138,12 @@ androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit
 androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutinesTest" }
-androidx-compose-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview", version.ref = "uiToolingPreview" }
-androidx-compose-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling", version.ref = "uiTooling" }
-androidx-animation = { group = "androidx.compose.animation", name = "animation", version.ref = "animation" }
-androidx-compose-animation-core = { group = "androidx.compose.animation", name = "animation-core", version.ref = "animationCore" }
 androidx-palette-ktx = { group = "androidx.palette", name = "palette-ktx", version.ref = "paletteKtx" }
+symbol-processing-gradle-plugin = { module = "com.google.devtoolsksp:symbol-processing-gradle-plugin", version.ref = "symbolProcessingGradlePlugin" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 android-library = { id = "com.android.library", version.ref = "agp" }
-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 hilt-android = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }

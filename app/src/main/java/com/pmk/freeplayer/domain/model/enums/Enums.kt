@@ -5,15 +5,20 @@ enum class IntegrityStatus {
    LIMPIO, // Metadatos procesados y validados
    ENRIQUECIDO, // Complementado con Genius + letra
 }
-
-enum class LetterStatus {
-   NO_BUSCADA,
-   NO_ENCONTRADA,
-   ENCONTRADA_INCRUSTADA, // Antes FuenteLetra.INCRUSTADA
-   ENCONTRADA_LOCAL, // Antes FuenteLetra.ARCHIVO_LOCAL
-   ENCONTRADA_ONLINE, // Antes FuenteLetra.EN_LINEA
+enum class LyricsStatus {
+	// Search states
+	NOT_SEARCHED,  // Never searched
+	SEARCHING,     // Currently searching...
+	
+	// Result states
+	FOUND_EMBEDDED,  // Found in audio file tags
+	FOUND_LOCAL,     // Found in .lrc file
+	FOUND_ONLINE,    // Found via Genius/other API
+	
+	// Error states
+	NOT_FOUND,       // Searched but not found
+	ERROR,           // Connection/API error
 }
-
 enum class AudioFormat(val extension: String) {
    MP3("mp3"),
    FLAC("flac"),
@@ -68,15 +73,27 @@ enum class AlbumType {
 }
 
 enum class SocialPlatform {
-   INSTAGRAM,
-   TWITTER, // O "X"
-   FACEBOOK,
-   YOUTUBE,
-   SPOTIFY,
-   SOUNDCLOUD,
-   WEBSITE,
-   TIKTOK,
-   UNKNOWN;
+	// Streaming
+	SPOTIFY,
+	APPLE_MUSIC,
+	YOUTUBE_MUSIC,
+	SOUNDCLOUD,
+	BANDCAMP,
+	
+	// Social media
+	INSTAGRAM,
+	TWITTER,
+	TIKTOK,
+	FACEBOOK,
+	
+	// Metadata
+	GENIUS,
+	DISCOGS,
+	MUSICBRAINZ,
+	
+	// Other
+	WEBSITE,
+	UNKNOWN;
 
    companion object {
       fun fromString(value: String): SocialPlatform {
@@ -108,13 +125,6 @@ enum class PlaybackSource {
    UNKNOWN,
 }
 
-enum class LyricsStatus {
-   SEARCHING, // "Buscando..."
-   FOUND, // "Letra encontrada"
-   NOT_FOUND, // "No se encontró letra"
-   ERROR, // "Error de conexión"
-}
-
 enum class AudioOutput {
    SPEAKER,
    HEADPHONES,
@@ -138,26 +148,27 @@ enum class Language(val codigoIso: String) {
 }
 
 // --- Visualización y Listas ---
-enum class SortCryterio {
-   TITULO,
-   ARTISTA,
-   ALBUM,
-   DURACION,
-   FECHA_AGREGADO,
-   ANIO,
-   REPRODUCCIONES,
-   ULTIMA_REPRODUCCION,
-   TAMANIO,
+enum class SortField {
+	NAME,
+	ARTIST_NAME,      // Antes ARTIST
+	ALBUM_COUNT,      // Antes ALBUM (Para artistas suele ser conteo)
+	SONG_COUNT,       // Nuevo (Faltaba en el enum original pero se usaba en la lógica)
+	DURATION,         // Antes DURACION
+	DATE_ADDED,
+	YEAR,             // Antes ANIO
+	PLAY_COUNT,       // Antes REPRODUCCIONES
+	LAST_PLAYED,      // Antes ULTIMA_REPRODUCCION
+	SIZE              // Antes TAMANIO
 }
 
 enum class SortDirection {
-   ASCENDENTE,
-   DESCENDENTE,
+	ASCENDING,
+	DESCENDING
 }
 
-data class SortConfiguration(
-	val criterio: SortCryterio,
-	val direccion: SortDirection = SortDirection.ASCENDENTE,
+data class SortConfig(
+	val field: SortField,
+	val direction: SortDirection = SortDirection.ASCENDING,
 )
 
 enum class TipoListaSistema {
@@ -169,9 +180,9 @@ enum class TipoListaSistema {
 
 // --- Reproducción y Audio ---
 enum class RepeatMode {
-   DESACTIVADO,
-   UNA,
-   TODO,
+   OFF,
+   ONE,
+   ALL,
 }
 
 enum class EqualizerPreset {

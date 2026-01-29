@@ -1,28 +1,16 @@
 package com.pmk.freeplayer.domain.repository
 
-import com.pmk.freeplayer.domain.model.EnrichmentResult
-import kotlinx.coroutines.flow.Flow
+import com.pmk.freeplayer.domain.model.Song
+import com.pmk.freeplayer.domain.model.scanner.EnrichmentResult
 
 interface EnrichmentRepository {
 	
-	// ─────────────────────────────────────────────────────────────
-	// Enrichment results
-	// ─────────────────────────────────────────────────────────────
-	suspend fun saveEnrichmentResult(result: EnrichmentResult): Long
-	
-	fun getEnrichmentHistory(limit: Int = 20): Flow<List<EnrichmentResult>>
-	
-	suspend fun getLastEnrichment(): EnrichmentResult?
-	
-	// ─────────────────────────────────────────────────────────────
-	// Accumulated statistics
-	// ─────────────────────────────────────────────────────────────
-	suspend fun getTotalEnrichedSongs(): Int
-	
-	suspend fun getTotalLyricsObtained(): Int
-	
-	// ─────────────────────────────────────────────────────────────
-	// Cleanup
-	// ─────────────────────────────────────────────────────────────
-	suspend fun clearEnrichmentHistory(keepLast: Int = 10)
+	/**
+	 * Busca metadatos y letras en fuentes externas (Genius), valida la coincidencia
+	 * y guarda los resultados localmente.
+	 *
+	 * @param song La canción local que se desea enriquecer.
+	 * @return El resultado del proceso de enriquecimiento (éxito/fallo, scores, etc).
+	 */
+	suspend fun enrichSong(song: Song): EnrichmentResult
 }

@@ -155,6 +155,9 @@ interface SongDao {
 	@Query("SELECT * FROM songs WHERE metadata_status = :status LIMIT :limit")
 	suspend fun getSongsByMetadataStatus(status: String, limit: Int = 50): List<SongEntity>
 	
+	@Query("SELECT COALESCE(SUM(duration), 0) FROM songs WHERE song_id IN (:ids)")
+	suspend fun getTotalDurationForIds(ids: List<Long>): Long
+	
 	// ==================== DTOs INTERNOS ====================
 	
 	data class SongScanInfo(
@@ -176,7 +179,13 @@ interface SongDao {
         (SELECT COUNT(*) FROM artists) as total_artists,
         (SELECT COUNT(*) FROM albums) as total_albums,
         (SELECT COUNT(*) FROM genres) as total_genres,
-        (SELECT COALESCE(SUM(duration), 0) FROM songs) as total_duration_ms
+        (SELECT COALESCE(SUM(duration), 0) FROM songs) as total_duration_ms,
+        (SELECT COALESCE(SUM(file_size), 0) FROM songs) as total_size,
+        (SELECT MAX(date_added) FROM songs) as last_added,
+        (SELECT COUNT(*) FROM songs WHERE metadata_status = 'CRUDO') as count_crude,
+        (SELECT COUNT(*) FROM songs WHERE metadata_status = 'LIMPIO') as count_clean,
+        (SELECT COUNT(*) FROM songs WHERE metadata_status = 'ENRIQUECIDO') as count_enriched,
+        (SELECT COUNT(*) FROM songs WHERE has_lyrics = 1) as count_lyrics
 """)
 	suspend fun getLibraryStats(): LibraryStatsDto
 	
@@ -216,6 +225,64 @@ interface SongDao {
 """)
 	suspend fun getTopSongsDto(limit: Int = 10): List<TopItemDto>
 	
+	@Query("SELECT * FROM songs WHERE metadata_status = 'CRUDO' LIMIT :limit")
+	suspend fun getSongsPendingCleaning(limit: Int = 100): List<SongEntity>
 	
+	/** Canciones limpias, pendientes de enriquecimiento */
+	@Query("SELECT * FROM songs WHERE metadata_status = 'LIMPIO' LIMIT :limit")
+	suspend fun getSongsPendingEnrichment(limit: Int = 100): List<SongEntity>
+	
+	/** Canciones ya enriquecidas */
+	@Query("SELECT * FROM songs WHERE metadata_status = 'ENRIQUECIDO'")
+	fun getEnrichedSongs(): Flow<List<SongEntity>>
+	
+	/** Actualizar estado de metadatos */
+	@Query("""
+    UPDATE songs
+    SET metadata_status = :status,
+        confidence_score = :confidence
+    WHERE song_id = :songId
+""")
+	suspend fun updateMetadataStatus(songId: Long, status: String, confidence: Float = 1f)
+	
+	/** Marcar como LIMPIO con timestamp */
+	@Query("""
+    UPDATE songs
+    SET metadata_status = 'LIMPIO',
+        fecha_limpieza = :timestamp,
+        title = :cleanTitle,
+        confidence_score = :confidence
+    WHERE song_id = :songId
+""")
+	suspend fun markAsCleaned(
+		songId: Long,
+		cleanTitle: String,
+		confidence: Float,
+		timestamp: Long = System.currentTimeMillis()
+	)
+	
+	/** Marcar como ENRIQUECIDO con timestamp */
+	@Query("""
+    UPDATE songs
+    SET metadata_status = 'ENRIQUECIDO',
+        fecha_enriquecimiento = :timestamp,
+        has_lyrics = :hasLyrics,
+        genius_id = :geniusId,
+        genius_url = :geniusUrl,
+        confidence_score = :confidence
+    WHERE song_id = :songId
+""")
+	suspend fun markAsEnriched(
+		songId: Long,
+		hasLyrics: Boolean,
+		geniusId: String?,
+		geniusUrl: String?,
+		confidence: Float,
+		timestamp: Long = System.currentTimeMillis()
+	)
+	
+	/** Conteo por estado */
+	@Query("SELECT COUNT(*) FROM songs WHERE metadata_status = :status")
+	suspend fun countByMetadataStatus(status: String): Int
 }
 

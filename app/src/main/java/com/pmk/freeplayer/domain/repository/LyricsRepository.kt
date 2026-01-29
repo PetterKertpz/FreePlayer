@@ -7,34 +7,42 @@ import kotlinx.coroutines.flow.Flow
 
 interface LyricsRepository {
 	
-	// ─────────────────────────────────────────────────────────────
-	// Get and manage lyrics
-	// ─────────────────────────────────────────────────────────────
+	// ═══════════════════════════════════════════════════════════════
+	// GET & MANAGE LYRICS
+	// ═══════════════════════════════════════════════════════════════
+	
 	fun getLyrics(songId: Long): Flow<Lyrics?>
-	
 	suspend fun saveLyrics(lyrics: Lyrics)
-	
 	suspend fun deleteLyrics(songId: Long)
-	
 	suspend fun hasLyrics(songId: Long): Boolean
 	
-	// ─────────────────────────────────────────────────────────────
-	// Search lyrics
-	// ─────────────────────────────────────────────────────────────
-	suspend fun searchLyricsOnline(title: String, artist: String): Lyrics
+	// ═══════════════════════════════════════════════════════════════
+	// SEARCH LYRICS
+	// ═══════════════════════════════════════════════════════════════
 	
-	suspend fun searchLocalLrcFile(songPath: String): Lyrics
+	/**
+	 * Searches for lyrics online.
+	 * Implementation details (Genius, etc.) are hidden in the data layer.
+	 */
+	suspend fun searchOnline(title: String, artist: String): Lyrics?
 	
-	// ─────────────────────────────────────────────────────────────
-	// Lyrics status
-	// ─────────────────────────────────────────────────────────────
-	suspend fun updateLyricsStatus(songId: Long, status: LyricsStatus)
+	/**
+	 * Searches for a local .lrc file matching the song path.
+	 */
+	suspend fun searchLocalLrcFile(songPath: String): Lyrics?
 	
-	suspend fun saveLyricsWithStatus(songId: Long, lyrics: String, geniusUrl: String?)
+	// ═══════════════════════════════════════════════════════════════
+	// LYRICS STATUS
+	// ═══════════════════════════════════════════════════════════════
 	
-	suspend fun markLyricsNotFound(songId: Long)
+	suspend fun updateStatus(songId: Long, status: LyricsStatus)
+	suspend fun markAsFound(songId: Long, lyrics: String, sourceUrl: String? = null)
+	suspend fun markAsNotFound(songId: Long)
 	
-	fun getSongsWithoutSearchedLyrics(limit: Int = 50): Flow<List<Song>>
+	// ═══════════════════════════════════════════════════════════════
+	// BATCH QUERIES
+	// ═══════════════════════════════════════════════════════════════
 	
-	suspend fun countByLyricsStatus(status: LyricsStatus): Int
+	fun getSongsPendingLyricsSearch(limit: Int = 50): Flow<List<Song>>
+	suspend fun countByStatus(status: LyricsStatus): Int
 }
