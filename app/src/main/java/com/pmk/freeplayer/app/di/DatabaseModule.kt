@@ -2,17 +2,14 @@ package com.pmk.freeplayer.app.di
 
 import android.content.Context
 import androidx.room.Room
-import com.pmk.freeplayer.data.local.dao.AlbumDao
-import com.pmk.freeplayer.data.local.dao.ArtistDao
-import com.pmk.freeplayer.data.local.dao.EnrichmentResultDao
-import com.pmk.freeplayer.data.local.dao.GenreDao
-import com.pmk.freeplayer.data.local.dao.LyricsDao
-import com.pmk.freeplayer.data.local.dao.PlaybackHistoryDao
-import com.pmk.freeplayer.data.local.dao.PlaylistDao
-import com.pmk.freeplayer.data.local.dao.QueueDao
-import com.pmk.freeplayer.data.local.dao.ScannerDao
-import com.pmk.freeplayer.data.local.dao.SongDao
-import com.pmk.freeplayer.data.local.db.AppDatabase
+import com.pmk.freeplayer.feature.albums.data.local.dao.AlbumDao
+import com.pmk.freeplayer.feature.artists.data.local.dao.ArtistDao
+import com.pmk.freeplayer.feature.genres.data.local.dao.GenreDao
+import com.pmk.freeplayer.feature.statistics.data.local.dao.PlaybackHistoryDao
+import com.pmk.freeplayer.feature.playlists.data.local.dao.PlaylistDao
+import com.pmk.freeplayer.feature.player.data.local.dao.QueueDao
+import com.pmk.freeplayer.feature.songs.data.local.dao.SongDao
+import com.pmk.freeplayer.core.data.local.db.AppDatabase
 import com.pmk.freeplayer.data.local.source.DeviceMusicDataSource
 import dagger.Module
 import dagger.Provides

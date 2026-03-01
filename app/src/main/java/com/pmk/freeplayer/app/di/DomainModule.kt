@@ -1,7 +1,7 @@
 package com.pmk.freeplayer.app.di
 
-import com.pmk.freeplayer.domain.strategy.FuzzySongMatchingStrategy
-import com.pmk.freeplayer.domain.strategy.SongMatchingStrategy
+import com.pmk.freeplayer.feature.scanner.domain.model.FuzzySongMatchingStrategy
+import com.pmk.freeplayer.feature.scanner.domain.model.SongMatchingStrategy
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
