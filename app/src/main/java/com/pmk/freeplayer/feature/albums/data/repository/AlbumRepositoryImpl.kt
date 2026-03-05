@@ -1,5 +1,6 @@
 package com.pmk.freeplayer.feature.albums.data.repository
 
+import com.pmk.freeplayer.app.di.IoDispatcher
 import com.pmk.freeplayer.core.domain.model.enums.SortConfig
 import com.pmk.freeplayer.core.domain.model.enums.SortDirection
 import com.pmk.freeplayer.core.domain.model.enums.SortField
@@ -17,12 +18,11 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
-import javax.inject.Named
 
 class AlbumRepositoryImpl @Inject constructor(
 	private val albumDao: AlbumDao,
 	private val songDao: SongDao,
-	@Named("IoDispatcher") private val ioDispatcher: CoroutineDispatcher,
+	@IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : AlbumRepository {
 	
 	// ── Queries ───────────────────────────────────────────────────

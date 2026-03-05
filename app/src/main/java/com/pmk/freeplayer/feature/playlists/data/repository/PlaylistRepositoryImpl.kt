@@ -1,5 +1,6 @@
 package com.pmk.freeplayer.feature.playlists.data.repository
 
+import com.pmk.freeplayer.app.di.IoDispatcher
 import com.pmk.freeplayer.feature.playlists.data.local.dao.PlaylistDao
 import com.pmk.freeplayer.feature.playlists.data.local.relation.PlaylistSongJoin
 import com.pmk.freeplayer.feature.playlists.data.mapper.createUserPlaylistEntity
@@ -17,12 +18,11 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
-import javax.inject.Named
 
 class PlaylistRepositoryImpl @Inject constructor(
 	private val playlistDao: PlaylistDao,
 	private val songDao: SongDao,
-	@Named("IoDispatcher") private val ioDispatcher: CoroutineDispatcher,
+	@IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : PlaylistRepository {
 	
 	// ── Queries ───────────────────────────────────────────────────

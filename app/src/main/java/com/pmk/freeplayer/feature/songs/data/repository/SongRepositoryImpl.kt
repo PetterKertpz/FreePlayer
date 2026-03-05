@@ -1,5 +1,6 @@
 package com.pmk.freeplayer.feature.songs.data.repository
 
+import com.pmk.freeplayer.app.di.IoDispatcher
 import com.pmk.freeplayer.core.domain.model.enums.SortConfig
 import com.pmk.freeplayer.core.domain.model.enums.SortDirection
 import com.pmk.freeplayer.core.domain.model.enums.SortField
@@ -14,14 +15,13 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
-import javax.inject.Named
 
 class SongRepositoryImpl
 @Inject
 constructor(
-   private val songDao: SongDao,
-   private val audioFileDataSource: AudioFileDataSource,
-   @Named("IoDispatcher") private val ioDispatcher: CoroutineDispatcher,
+	private val songDao: SongDao,
+	private val audioFileDataSource: AudioFileDataSource,
+	@IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : SongRepository {
 
    // ── Queries ───────────────────────────────────────────────────

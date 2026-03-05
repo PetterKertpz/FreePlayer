@@ -1,5 +1,6 @@
 package com.pmk.freeplayer.feature.genres.data.repository
 
+import com.pmk.freeplayer.app.di.IoDispatcher
 import com.pmk.freeplayer.feature.genres.data.local.dao.GenreDao
 import com.pmk.freeplayer.feature.genres.data.mapper.createGenreEntity
 import com.pmk.freeplayer.feature.genres.data.mapper.toDomain
@@ -15,12 +16,11 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
-import javax.inject.Named
 
 class GenreRepositoryImpl @Inject constructor(
 	private val genreDao: GenreDao,
 	private val songDao: SongDao,
-	@Named("IoDispatcher") private val ioDispatcher: CoroutineDispatcher,
+	@IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : GenreRepository {
 	
 	// ── Queries ───────────────────────────────────────────────────

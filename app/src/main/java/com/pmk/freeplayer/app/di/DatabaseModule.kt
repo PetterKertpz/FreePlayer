@@ -5,6 +5,7 @@ import androidx.room.Room
 import com.pmk.freeplayer.core.data.local.db.AppDatabase
 import com.pmk.freeplayer.feature.albums.data.local.dao.AlbumDao
 import com.pmk.freeplayer.feature.artists.data.local.dao.ArtistDao
+import com.pmk.freeplayer.feature.auth.data.local.dao.UserDao
 import com.pmk.freeplayer.feature.genres.data.local.dao.GenreDao
 import com.pmk.freeplayer.feature.playlists.data.local.dao.PlaylistDao
 import com.pmk.freeplayer.feature.songs.data.local.dao.SongDao
@@ -50,6 +51,8 @@ object DatabaseModule {
 	
 	@Provides
 	fun provideGenreDao(db: AppDatabase): GenreDao = db.genreDao()
+	
+	fun provideUserDao(db: AppDatabase): UserDao = db.userDao()
 	
 	@Provides
 	fun provideStatisticsDao(db: AppDatabase): StatisticsDao = db.statisticsDao()
