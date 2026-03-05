@@ -115,7 +115,8 @@ kotlin {
 
 dependencies {
 
-   // ========================================
+   implementation(libs.androidx.lifecycle.service)
+	// ========================================
    // CORE LIBRARY DESUGARING
    // ========================================
    coreLibraryDesugaring(libs.desugar.jdk.libs)

@@ -12,60 +12,60 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface StatisticsDao {
-
-   // ── Write path (always call recordPlay, never insert directly) ─
-
-   @Insert suspend fun insertEvent(event: PlayEventEntity): Long
-
-   /**
-    * Upserts the aggregate for ONE entity. Called once per affected entity inside the recordPlay
-    * transaction.
-    */
-   @Query(
-      """
-        INSERT INTO stats_aggregates
+	
+	// ── Write path (always call recordPlay, never insert directly) ─
+	
+	@Insert
+	suspend fun insertEvent(event: PlayEventEntity): Long
+	
+	@Query("""
+        INSERT OR IGNORE INTO stats_aggregates
             (entity_type, entity_id, play_count, total_listened_ms, skip_count, last_played_at, first_played_at)
         VALUES
-            (:type, :id, 1, :listenedMs, :skipDelta, :playedAt, :playedAt)
-        ON CONFLICT(entity_type, entity_id) DO UPDATE SET
+            (:type, :id, 0, 0, 0, NULL, NULL)
+    """)
+	suspend fun insertAggregateIfAbsent(type: EntityType, id: Long)
+	
+	@Query("""
+        UPDATE stats_aggregates SET
             play_count        = play_count + 1,
             total_listened_ms = total_listened_ms + :listenedMs,
             skip_count        = skip_count + :skipDelta,
             last_played_at    = :playedAt,
             first_played_at   = COALESCE(first_played_at, :playedAt)
-    """
-   )
-   suspend fun upsertAggregate(
-      type: EntityType,
-      id: Long,
-      listenedMs: Long,
-      skipDelta: Long, // 1 if skipped, 0 otherwise
-      playedAt: Long,
-   )
-
-   /**
-    * Core write transaction: inserts the event log entry and atomically updates all affected entity
-    * aggregates in one shot.
-    */
-   @Transaction
-   suspend fun recordPlay(event: PlayEventEntity) {
-      insertEvent(event)
-      val skip = if (event.wasSkipped) 1L else 0L
-
-      upsertAggregate(EntityType.SONG, event.songId, event.listenedMs, skip, event.playedAt)
-      event.artistId?.let {
-         upsertAggregate(EntityType.ARTIST, it, event.listenedMs, skip, event.playedAt)
-      }
-      event.albumId?.let {
-         upsertAggregate(EntityType.ALBUM, it, event.listenedMs, skip, event.playedAt)
-      }
-      event.genreId?.let {
-         upsertAggregate(EntityType.GENRE, it, event.listenedMs, skip, event.playedAt)
-      }
-      event.playlistId?.let {
-         upsertAggregate(EntityType.PLAYLIST, it, event.listenedMs, skip, event.playedAt)
-      }
-   }
+        WHERE entity_type = :type AND entity_id = :id
+    """)
+	suspend fun incrementAggregate(
+		type: EntityType,
+		id: Long,
+		listenedMs: Long,
+		skipDelta: Long,
+		playedAt: Long,
+	)
+	
+	@Transaction
+	suspend fun upsertAggregate(
+		type: EntityType,
+		id: Long,
+		listenedMs: Long,
+		skipDelta: Long,
+		playedAt: Long,
+	) {
+		insertAggregateIfAbsent(type, id)
+		incrementAggregate(type, id, listenedMs, skipDelta, playedAt)
+	}
+	
+	@Transaction
+	suspend fun recordPlay(event: PlayEventEntity) {
+		insertEvent(event)
+		val skip = if (event.wasSkipped) 1L else 0L
+		
+		upsertAggregate(EntityType.SONG, event.songId, event.listenedMs, skip, event.playedAt)
+		event.artistId?.let  { upsertAggregate(EntityType.ARTIST,   it, event.listenedMs, skip, event.playedAt) }
+		event.albumId?.let   { upsertAggregate(EntityType.ALBUM,    it, event.listenedMs, skip, event.playedAt) }
+		event.genreId?.let   { upsertAggregate(EntityType.GENRE,    it, event.listenedMs, skip, event.playedAt) }
+		event.playlistId?.let { upsertAggregate(EntityType.PLAYLIST, it, event.listenedMs, skip, event.playedAt) }
+	}
 
    // ── Aggregate reads (O(1) PK lookup) ──────────────────────────
 
@@ -153,4 +153,73 @@ interface StatisticsDao {
     """
    )
    suspend fun recomputeSongAggregates()
+	
+	@Query("""
+    INSERT OR REPLACE INTO stats_aggregates
+        (entity_type, entity_id, play_count, total_listened_ms, skip_count, last_played_at, first_played_at)
+    SELECT
+        'ARTIST'          AS entity_type,
+        artist_id         AS entity_id,
+        COUNT(*)          AS play_count,
+        SUM(listened_ms)  AS total_listened_ms,
+        SUM(was_skipped)  AS skip_count,
+        MAX(played_at)    AS last_played_at,
+        MIN(played_at)    AS first_played_at
+    FROM play_events
+    WHERE artist_id IS NOT NULL
+    GROUP BY artist_id
+""")
+	suspend fun recomputeArtistAggregates()
+	
+	@Query("""
+    INSERT OR REPLACE INTO stats_aggregates
+        (entity_type, entity_id, play_count, total_listened_ms, skip_count, last_played_at, first_played_at)
+    SELECT
+        'ALBUM'           AS entity_type,
+        album_id          AS entity_id,
+        COUNT(*)          AS play_count,
+        SUM(listened_ms)  AS total_listened_ms,
+        SUM(was_skipped)  AS skip_count,
+        MAX(played_at)    AS last_played_at,
+        MIN(played_at)    AS first_played_at
+    FROM play_events
+    WHERE album_id IS NOT NULL
+    GROUP BY album_id
+""")
+	suspend fun recomputeAlbumAggregates()
+	
+	@Query("""
+    INSERT OR REPLACE INTO stats_aggregates
+        (entity_type, entity_id, play_count, total_listened_ms, skip_count, last_played_at, first_played_at)
+    SELECT
+        'GENRE'           AS entity_type,
+        genre_id          AS entity_id,
+        COUNT(*)          AS play_count,
+        SUM(listened_ms)  AS total_listened_ms,
+        SUM(was_skipped)  AS skip_count,
+        MAX(played_at)    AS last_played_at,
+        MIN(played_at)    AS first_played_at
+    FROM play_events
+    WHERE genre_id IS NOT NULL
+    GROUP BY genre_id
+""")
+	suspend fun recomputeGenreAggregates()
+	
+	@Query("""
+    INSERT OR REPLACE INTO stats_aggregates
+        (entity_type, entity_id, play_count, total_listened_ms, skip_count, last_played_at, first_played_at)
+    SELECT
+        'PLAYLIST'        AS entity_type,
+        playlist_id       AS entity_id,
+        COUNT(*)          AS play_count,
+        SUM(listened_ms)  AS total_listened_ms,
+        SUM(was_skipped)  AS skip_count,
+        MAX(played_at)    AS last_played_at,
+        MIN(played_at)    AS first_played_at
+    FROM play_events
+    WHERE playlist_id IS NOT NULL
+    GROUP BY playlist_id
+""")
+	suspend fun recomputePlaylistAggregates()
+	
 }

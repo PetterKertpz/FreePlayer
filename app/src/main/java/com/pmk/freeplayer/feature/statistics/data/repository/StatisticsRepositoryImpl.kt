@@ -1,5 +1,6 @@
 package com.pmk.freeplayer.feature.statistics.data.repository
 
+import com.pmk.freeplayer.app.di.IoDispatcher
 import com.pmk.freeplayer.feature.statistics.data.local.dao.StatisticsDao
 import com.pmk.freeplayer.feature.statistics.data.mapper.toDomain
 import com.pmk.freeplayer.feature.statistics.data.mapper.toEntity
@@ -13,11 +14,12 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
-import javax.inject.Named
+import javax.inject.Singleton
 
+@Singleton
 class StatisticsRepositoryImpl @Inject constructor(
 	private val statisticsDao: StatisticsDao,
-	@Named("IoDispatcher") private val ioDispatcher: CoroutineDispatcher,
+	@IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : StatisticsRepository {
 	
 	override suspend fun recordPlay(event: PlayEvent) = withContext(ioDispatcher) {
@@ -48,6 +50,9 @@ class StatisticsRepositoryImpl @Inject constructor(
 	
 	override suspend fun recomputeAllAggregates() = withContext(ioDispatcher) {
 		statisticsDao.recomputeSongAggregates()
-		// repeat for ARTIST, ALBUM, GENRE, PLAYLIST with equivalent queries
+		statisticsDao.recomputeArtistAggregates()
+		statisticsDao.recomputeAlbumAggregates()
+		statisticsDao.recomputeGenreAggregates()
+		statisticsDao.recomputePlaylistAggregates()
 	}
 }

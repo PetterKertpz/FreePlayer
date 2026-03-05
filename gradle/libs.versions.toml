@@ -59,6 +59,7 @@ uiTooling = "1.10.1"
 animation = "1.10.1"
 animationCore = "1.10.1"
 paletteKtx = "1.0.0"
+lifecycleService = "2.10.0"
 
 [libraries]
 # --- Core Android ---
@@ -142,6 +143,7 @@ mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutinesTest" }
 androidx-palette-ktx = { group = "androidx.palette", name = "palette-ktx", version.ref = "paletteKtx" }
 symbol-processing-gradle-plugin = { module = "com.google.devtoolsksp:symbol-processing-gradle-plugin", version.ref = "symbolProcessingGradlePlugin" }
+androidx-lifecycle-service = { group = "androidx.lifecycle", name = "lifecycle-service", version.ref = "lifecycleService" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

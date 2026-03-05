@@ -52,9 +52,13 @@ class SettingsRepositoryImpl @Inject constructor(private val dataStore: Settings
    override suspend fun setPlaybackSpeed(speed: Float) = dataStore.setPlaybackSpeed(speed)
 
    override suspend fun setNormalizationEnabled(v: Boolean) = dataStore.setNormalizationEnabled(v)
-
+	
+	// ── Scanner ───────────────────────────────────────────────────
+	override suspend fun addExcludedPath(path: String)    = dataStore.addExcludedPath(path)
+	override suspend fun removeExcludedPath(path: String) = dataStore.removeExcludedPath(path)
+	
    // ── Library ───────────────────────────────────────────────────
-   override suspend fun setSortConfig(config: SortConfig) = dataStore.setSortConfig(config)
+   override suspend fun setSortConfig(sortConfig: SortConfig) = dataStore.setSortConfig(sortConfig)
 
    override suspend fun setGridColumns(columns: Int) = dataStore.setGridColumns(columns)
 

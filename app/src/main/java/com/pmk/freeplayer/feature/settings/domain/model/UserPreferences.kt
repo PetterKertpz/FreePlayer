@@ -36,6 +36,7 @@ data class UserPreferences(
 	val sortConfig: SortConfig          = SortConfig(SortField.NAME, SortDirection.ASCENDING),
 	val gridColumns: Int                = 2,
 	val minDurationSeconds: Int         = 30,
+	val excludedPaths: Set<String> = emptySet(),
 	
 	// ── Lyrics ────────────────────────────────────────────────────
 	val autoSearchLyrics: Boolean       = true,

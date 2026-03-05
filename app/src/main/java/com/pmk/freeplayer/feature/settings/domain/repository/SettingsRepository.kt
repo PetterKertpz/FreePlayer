@@ -35,6 +35,10 @@ interface SettingsRepository {
 	suspend fun setPlaybackSpeed(speed: Float)
 	suspend fun setNormalizationEnabled(enabled: Boolean)
 	
+	// ── Scanner ───────────────────────────────────────────────────
+	suspend fun addExcludedPath(path: String)
+	suspend fun removeExcludedPath(path: String)
+	
 	// ── Library ───────────────────────────────────────────────────
 	suspend fun setSortConfig(sortConfig: SortConfig)
 	suspend fun setGridColumns(columns: Int)

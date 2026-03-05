@@ -1,4 +1,4 @@
-package com.pmk.freeplayer.app.di
+package com.pmk.freeplayer.app
 
 import android.app.Application
 import androidx.hilt.work.HiltWorkerFactory
@@ -9,7 +9,8 @@ import javax.inject.Inject
 @HiltAndroidApp
 class FreePlayerApp : Application(), Configuration.Provider {
 
-   @Inject lateinit var workerFactory: HiltWorkerFactory
+   @Inject
+   lateinit var workerFactory: HiltWorkerFactory
 
    override val workManagerConfiguration: Configuration
       get() = Configuration.Builder().setWorkerFactory(workerFactory).build()
