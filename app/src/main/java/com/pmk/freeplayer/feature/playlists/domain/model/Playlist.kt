@@ -9,17 +9,26 @@ data class Playlist(
 	val coverUri: String?,
 	val hexColor: String?,
 	
-	// Tipos
-	val isSystem: Boolean, // ¿Es de sistema o de usuario?
-	val isPinned: Boolean, // ¿Está fijada arriba?
+	// ── Type ──────────────────────────────────────────────────────
+	val isSystem: Boolean,
+	val systemType: SystemPlaylistType?,  // FIX: enum, not String
+	val isPinned: Boolean,
 	
-	// Stats (Pre-calculados en la Entity)
+	// ── Structural cache ──────────────────────────────────────────
+	// FIX: playCount removed — delegated to feature/statistics
 	val songCount: Int,
-	val totalDuration: TrackDuration, // Usamos tu clase bonita
+	val totalDuration: TrackDuration,
 	
+	// ── Timestamps ────────────────────────────────────────────────
 	val createdAt: Long,
-	val updatedAt: Long
+	val updatedAt: Long,
 ) {
-	// Lógica visual: Si no tiene portada, la UI generará un collage
 	val hasCustomCover: Boolean get() = !coverUri.isNullOrBlank()
+	val isEmpty: Boolean        get() = songCount == 0
+	val isNotEmpty: Boolean     get() = songCount > 0
+	
+	/** Statistics-backed playlists don't store songs in playlist_song_join. */
+	val isStatisticsBacked: Boolean
+		get() = systemType == SystemPlaylistType.RECENTLY_PLAYED ||
+				systemType == SystemPlaylistType.MOST_PLAYED
 }

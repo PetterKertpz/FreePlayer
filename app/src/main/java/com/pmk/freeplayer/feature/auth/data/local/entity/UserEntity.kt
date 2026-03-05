@@ -5,45 +5,80 @@ import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
 
+/**
+ * Representación en base de datos del usuario autenticado.
+ *
+ * Responsabilidad exclusiva: identidad, credenciales y perfil.
+ * Los contadores de estadísticas (plays, favoritos, playlists) se eliminaron
+ * de esta entidad — pertenecen a [feature.statistics] y se calculan
+ * desde sus propias tablas sin caché aquí.
+ */
 @Entity(
 	tableName = "users",
 	indices = [
 		Index(value = ["username"], unique = true),
-		Index(value = ["email"], unique = true)
+		Index(value = ["email"], unique = true),
 	]
 )
 data class UserEntity(
+	
 	@PrimaryKey(autoGenerate = true)
-	@ColumnInfo(name = "user_id") val userId: Long = 0,
+	@ColumnInfo(name = "user_id")
+	val userId: Long = 0,
 	
-	// ==================== IDENTIDAD ====================
-	@ColumnInfo(name = "username") val username: String,
-	@ColumnInfo(name = "email") val email: String,
+	// ═══════════════════════════════════════════════════════════════
+	// IDENTIDAD
+	// ═══════════════════════════════════════════════════════════════
 	
-	// Hash de la contraseña (BCrypt).
-	// NULLABLE: Porque si entra con Google, no tiene contraseña local.
-	@ColumnInfo(name = "password_hash") val passwordHash: String? = null,
-	@ColumnInfo(name = "salt") val salt: String? = null,
+	@ColumnInfo(name = "username")
+	val username: String,
 	
-	// ==================== PERFIL (Lo que se ve en la UI) ====================
-	@ColumnInfo(name = "full_name") val fullName: String? = null,
+	@ColumnInfo(name = "email")
+	val email: String,
 	
-	// URI local o URL remota
-	@ColumnInfo(name = "avatar_uri") val avatarUri: String? = null,
-	@ColumnInfo(name = "birth_date") val birthDate: Long? = null,
+	// ═══════════════════════════════════════════════════════════════
+	// SEGURIDAD — Solo para autenticación LOCAL
+	// Nullable porque los usuarios OAuth no tienen contraseña local.
+	// ═══════════════════════════════════════════════════════════════
 	
-	// ==================== AUTENTICACIÓN ====================
-	@ColumnInfo(name = "auth_type") val authType: String = "LOCAL", // "LOCAL", "GOOGLE"
-	@ColumnInfo(name = "external_id") val externalId: String? = null, // ID de Google
+	@ColumnInfo(name = "password_hash")
+	val passwordHash: String? = null,
 	
-	// ==================== ESTADO ====================
-	@ColumnInfo(name = "is_active") val isActive: Boolean = true,
-	@ColumnInfo(name = "last_login") val lastLogin: Long = System.currentTimeMillis(),
-	@ColumnInfo(name = "created_at") val createdAt: Long = System.currentTimeMillis(),
+	@ColumnInfo(name = "salt")
+	val salt: String? = null,
 	
-	// ==================== CACHÉ DE ESTADÍSTICAS ====================
-	// Solo para mostrar "Resumen" rápido en el perfil.
-	@ColumnInfo(name = "total_plays") val totalPlays: Int = 0,
-	@ColumnInfo(name = "favorite_count") val favoriteCount: Int = 0,
-	@ColumnInfo(name = "playlist_count") val playlistCount: Int = 0
+	// ═══════════════════════════════════════════════════════════════
+	// PERFIL
+	// ═══════════════════════════════════════════════════════════════
+	
+	@ColumnInfo(name = "full_name")
+	val fullName: String? = null,
+	
+	@ColumnInfo(name = "avatar_uri")
+	val avatarUri: String? = null,
+	
+	// ═══════════════════════════════════════════════════════════════
+	// AUTENTICACIÓN
+	// ═══════════════════════════════════════════════════════════════
+	
+	/** Valores posibles: "LOCAL", "GOOGLE", "FACEBOOK". */
+	@ColumnInfo(name = "auth_type")
+	val authType: String = "LOCAL",
+	
+	/** ID del usuario en el proveedor externo (Google UID, Facebook ID). */
+	@ColumnInfo(name = "external_id")
+	val externalId: String? = null,
+	
+	// ═══════════════════════════════════════════════════════════════
+	// ESTADO
+	// ═══════════════════════════════════════════════════════════════
+	
+	@ColumnInfo(name = "is_active")
+	val isActive: Boolean = true,
+	
+	@ColumnInfo(name = "last_login")
+	val lastLogin: Long = System.currentTimeMillis(),
+	
+	@ColumnInfo(name = "created_at")
+	val createdAt: Long = System.currentTimeMillis(),
 )

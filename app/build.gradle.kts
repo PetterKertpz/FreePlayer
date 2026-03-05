@@ -112,6 +112,7 @@ kotlin {
    }
 }
 
+
 dependencies {
 
    // ========================================
@@ -210,7 +211,7 @@ dependencies {
    implementation(libs.bcrypt) // Encriptación
    implementation(libs.accompanist.permissions) // Permisos en Compose
    implementation(libs.androidx.palette.ktx) // Extraer colores de carátulas
-
+	implementation(libs.kotlinx.serialization.json)
    // ========================================
    // TESTING
    // ========================================

@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "20757731563",
+    "project_id": "freeplayer-227f9",
+    "storage_bucket": "freeplayer-227f9.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:20757731563:android:3776ddd42f564f5f8a86ae",
+        "android_client_info": {
+          "package_name": "com.pmk.freeplayer"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "20757731563-g7adlr6qc1dah8v8ggdpk3nqerjl3peb.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.pmk.freeplayer",
+            "certificate_hash": "9cd63d78edffc0bb992a3240f2434ed2b80bc73e"
+          }
+        },
+        {
+          "client_id": "20757731563-lhov4b1td7q0tt9r2imt9p8voe8dmcn7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAlPR_5QovTiBMKujvA69OYYKxYCv-g8Ho"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "20757731563-lhov4b1td7q0tt9r2imt9p8voe8dmcn7.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

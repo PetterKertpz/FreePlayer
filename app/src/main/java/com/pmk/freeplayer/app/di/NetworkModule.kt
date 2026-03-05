@@ -3,7 +3,6 @@ package com.pmk.freeplayer.app.di
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.pmk.freeplayer.BuildConfig
-import com.pmk.freeplayer.data.remote.api.GeniusService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

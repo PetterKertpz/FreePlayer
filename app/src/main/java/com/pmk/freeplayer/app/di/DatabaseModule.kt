@@ -7,7 +7,6 @@ import com.pmk.freeplayer.feature.artists.data.local.dao.ArtistDao
 import com.pmk.freeplayer.feature.genres.data.local.dao.GenreDao
 import com.pmk.freeplayer.feature.statistics.data.local.dao.PlaybackHistoryDao
 import com.pmk.freeplayer.feature.playlists.data.local.dao.PlaylistDao
-import com.pmk.freeplayer.feature.player.data.local.dao.QueueDao
 import com.pmk.freeplayer.feature.songs.data.local.dao.SongDao
 import com.pmk.freeplayer.core.data.local.db.AppDatabase
 import com.pmk.freeplayer.data.local.source.DeviceMusicDataSource

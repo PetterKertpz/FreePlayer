@@ -8,85 +8,41 @@ import com.pmk.freeplayer.feature.artists.domain.repository.ArtistWithDetails
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
-// ═════════════════════════════════════════════════════════════════════════════
-// QUERIES
-// ═════════════════════════════════════════════════════════════════════════════
+// ── Query use cases ───────────────────────────────────────────────────────────
 
-/**
- * Consultas de artistas.
- *
- * Uso en ViewModel:
- * ```kotlin
- * getArtistsUseCase()
- * getArtistsUseCase(query = "Beatles")
- * getArtistsUseCase.byId(artistId)
- * getArtistsUseCase.withDetails(artistId)
- * getArtistsUseCase.totalCount()
- * ```
- */
-class GetArtistsUseCase @Inject constructor(
-	private val repository: ArtistRepository,
-) {
-	operator fun invoke(
-		query: String? = null,
-		sortConfig: SortConfig? = null,
-	): Flow<List<Artist>> = repository.getArtists(query, sortConfig)
-	
-	fun byId(id: Long): Flow<Artist?> =
-		repository.getArtistById(id)
-	
-	/**
-	 * Artista con canciones, álbumes y top canciones.
-	 * Usado en la pantalla de detalle.
-	 */
-	fun withDetails(artistId: Long): Flow<ArtistWithDetails?> =
-		repository.getArtistWithDetails(artistId)
-	
-	suspend fun totalCount(): Int =
-		repository.getTotalArtistsCount()
+class GetArtistsUseCase @Inject constructor(private val repository: ArtistRepository) {
+	operator fun invoke(query: String? = null, sortConfig: SortConfig? = null): Flow<List<Artist>> =
+		repository.getArtists(query, sortConfig)
 }
 
-// ═════════════════════════════════════════════════════════════════════════════
-// MUTATIONS
-// ═════════════════════════════════════════════════════════════════════════════
+class GetArtistByIdUseCase @Inject constructor(private val repository: ArtistRepository) {
+	operator fun invoke(id: Long): Flow<Artist?> = repository.getArtistById(id)
+}
 
-/**
- * Mutaciones de artistas: edición, canciones, favoritos y links externos.
- *
- * Uso en ViewModel:
- * ```kotlin
- * manageArtistsUseCase.update(artist)
- * manageArtistsUseCase.delete(artistId)
- * manageArtistsUseCase.addSong(songId, artistId)
- * manageArtistsUseCase.removeSong(songId, artistId)
- * manageArtistsUseCase.toggleFavorite(artistId)
- * manageArtistsUseCase.updateSocialLinks(artistId, links)
- * ```
- */
-class ManageArtistsUseCase @Inject constructor(
-	private val repository: ArtistRepository,
-) {
-	/** Actualiza metadatos del artista (nombre, biografía, foto). */
-	suspend fun update(artist: Artist) =
-		repository.updateArtist(artist)
-	
-	/**
-	 * Elimina el registro del artista en Room.
-	 * No elimina las canciones asociadas del dispositivo.
-	 */
-	suspend fun delete(id: Long) =
-		repository.deleteArtist(id)
-	
-	suspend fun addSong(songId: Long, artistId: Long) =
-		repository.addSongToArtist(songId, artistId)
-	
-	suspend fun removeSong(songId: Long, artistId: Long) =
-		repository.removeSongFromArtist(songId, artistId)
-	
-	suspend fun toggleFavorite(artistId: Long) =
-		repository.toggleFavoriteArtist(artistId)
-	
-	/** Actualiza los links externos: Genius, YouTube, Instagram, etc. */
-	suspend fun updateSocialLinks(artistId: Long, socialLinks: SocialLinks) =
+class GetArtistWithDetailsUseCase @Inject constructor(private val repository: ArtistRepository) {
+	operator fun invoke(artistId: Long): Flow<ArtistWithDetails?> =
+		repository.getArtistWithDetails(artistId)
+}
+
+class GetArtistsCountUseCase @Inject constructor(private val repository: ArtistRepository) {
+	suspend operator fun invoke(): Int = repository.count()
+}
+
+// ── Mutation use cases ────────────────────────────────────────────────────────
+
+class UpdateArtistUseCase @Inject constructor(private val repository: ArtistRepository) {
+	suspend operator fun invoke(artist: Artist) = repository.updateArtist(artist)
+}
+
+class DeleteArtistUseCase @Inject constructor(private val repository: ArtistRepository) {
+	suspend operator fun invoke(id: Long) = repository.deleteArtist(id)
+}
+
+class ToggleFavoriteArtistUseCase @Inject constructor(private val repository: ArtistRepository) {
+	suspend operator fun invoke(artistId: Long) = repository.toggleFavoriteArtist(artistId)
+}
+
+class UpdateArtistSocialLinksUseCase @Inject constructor(private val repository: ArtistRepository) {
+	suspend operator fun invoke(artistId: Long, socialLinks: SocialLinks) =
 		repository.updateSocialLinks(artistId, socialLinks)
 }

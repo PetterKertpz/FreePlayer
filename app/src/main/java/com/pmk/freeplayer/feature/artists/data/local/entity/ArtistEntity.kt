@@ -4,60 +4,72 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import com.pmk.freeplayer.feature.artists.domain.model.ArtistType
 
 @Entity(
-	tableName = "artists", // Inglés plural
+	tableName = "artists",
 	indices = [
-		Index(value = ["name"], unique = true), // Búsqueda rápida por nombre
+		Index(value = ["name"], unique = true),
 		Index(value = ["genius_id"]),
-		Index(value = ["spotify_id"])
+		Index(value = ["spotify_id"]),
 	]
 )
 data class ArtistEntity(
 	@PrimaryKey(autoGenerate = true)
-	@ColumnInfo(name = "artist_id") val artistId: Long = 0, // Long es estándar
+	@ColumnInfo(name = "artist_id")    val artistId: Long = 0,
 	
-	// --- Identidad ---
-	@ColumnInfo(name = "name") val name: String,
-	@ColumnInfo(name = "real_name") val realName: String? = null, // Ej: Eminem -> Marshall Mathers
+	// ── Identity ──────────────────────────────────────────────────
+	@ColumnInfo(name = "name")         val name: String,
+	@ColumnInfo(name = "real_name")    val realName: String?      = null,
+	@ColumnInfo(name = "artist_type")  val type: ArtistType       = ArtistType.UNKNOWN,
+	@ColumnInfo(name = "is_verified")  val isVerified: Boolean    = false,
 	
-	// --- Ubicación ---
-	@ColumnInfo(name = "country") val country: String? = null,
-	@ColumnInfo(name = "city") val city: String? = null,
+	// ── Location ──────────────────────────────────────────────────
+	@ColumnInfo(name = "country")      val country: String?       = null,
+	@ColumnInfo(name = "city")         val city: String?          = null,
 	
-	// --- Textos (Rich UI) ---
-	// 'description': Frase corta o tagline. 'biography': Texto largo completo.
-	@ColumnInfo(name = "description") val description: String? = null,
-	@ColumnInfo(name = "biography") val biography: String? = null,
+	// ── Biography ─────────────────────────────────────────────────
+	@ColumnInfo(name = "description")  val description: String?   = null,
+	@ColumnInfo(name = "biography")    val biography: String?     = null,
 	
-	// --- Fechas ---
-	@ColumnInfo(name = "birth_date") val birthDate: Long? = null,
-	@ColumnInfo(name = "career_start") val careerStartYear: Int? = null, // Basta con el año (Int)
+	// ── Genre (denormalized) ──────────────────────────────────────
+	@ColumnInfo(name = "genre_id")     val genreId: Long?         = null,
+	@ColumnInfo(name = "genre_name")   val genreName: String?     = null,
 	
-	// --- Multimedia ---
-	@ColumnInfo(name = "image_url") val remoteImageUrl: String? = null,     // Foto de perfil remota
-	@ColumnInfo(name = "image_path") val localImagePath: String? = null,    // Foto de perfil local
-	@ColumnInfo(name = "header_url") val remoteHeaderUrl: String? = null,   // Banner/Fondo
+	// ── Dates ─────────────────────────────────────────────────────
+	@ColumnInfo(name = "birth_date")   val birthDate: Long?       = null,
+	@ColumnInfo(name = "career_start") val careerStartYear: Int?  = null,
 	
-	// --- Enlaces y IDs Externos ---
-	@ColumnInfo(name = "genius_id") val geniusId: String? = null,
-	@ColumnInfo(name = "spotify_id") val spotifyId: String? = null,
-	@ColumnInfo(name = "website_url") val websiteUrl: String? = null,
+	// ── Multimedia ────────────────────────────────────────────────
+	@ColumnInfo(name = "image_url")    val remoteImageUrl: String? = null,
+	@ColumnInfo(name = "image_path")   val localImagePath: String? = null,
+	@ColumnInfo(name = "header_url")   val remoteHeaderUrl: String? = null,
 	
-	// --- Clasificación ---
-	@ColumnInfo(name = "genres") val genres: String? = null, // CSV: "Rap, Hip-Hop"
-	@ColumnInfo(name = "artist_type") val type: String? = null, // "SOLO", "BAND", "ORCHESTRA"
+	// ── External IDs ─────────────────────────────────────────────
+	@ColumnInfo(name = "genius_id")    val geniusId: String?      = null,
+	@ColumnInfo(name = "spotify_id")   val spotifyId: String?     = null,
+	@ColumnInfo(name = "website_url")  val websiteUrl: String?    = null,
 	
-	// --- Flags ---
-	@ColumnInfo(name = "is_verified") val isVerified: Boolean = false,
-	@ColumnInfo(name = "is_favorite") val isFavorite: Boolean = false, // Agregado para consistencia
+	// ── Social links (schema-ready; populated via migration) ──────
+	@ColumnInfo(name = "instagram_username") val instagramUsername: String? = null,
+	@ColumnInfo(name = "twitter_username")   val twitterUsername: String?   = null,
+	@ColumnInfo(name = "tiktok_username")    val tiktokUsername: String?    = null,
+	@ColumnInfo(name = "apple_music_url")    val appleMusicUrl: String?     = null,
+	@ColumnInfo(name = "youtube_music_url")  val youtubeMusicUrl: String?   = null,
+	@ColumnInfo(name = "facebook_url")       val facebookUrl: String?       = null,
+	@ColumnInfo(name = "soundcloud_url")     val soundcloudUrl: String?     = null,
+	@ColumnInfo(name = "bandcamp_url")       val bandcampUrl: String?       = null,
+	@ColumnInfo(name = "discogs_url")        val discogsUrl: String?        = null,
+	@ColumnInfo(name = "musicbrainz_id")     val musicBrainzId: String?     = null,
 	
-	// --- Estadísticas (Cacheadas para ordenar rápido) ---
-	@ColumnInfo(name = "total_songs") val totalSongs: Int = 0,
-	@ColumnInfo(name = "total_albums") val totalAlbums: Int = 0,
-	@ColumnInfo(name = "play_count") val playCount: Int = 0,
+	// ── User preferences ─────────────────────────────────────────
+	@ColumnInfo(name = "is_favorite")  val isFavorite: Boolean    = false,
 	
-	// --- Metadatos del Sistema ---
-	@ColumnInfo(name = "date_added") val dateAdded: Long = System.currentTimeMillis(),
-	@ColumnInfo(name = "last_updated") val lastUpdated: Long = System.currentTimeMillis()
+	// ── Cached structural counts ──────────────────────────────────
+	@ColumnInfo(name = "total_songs")  val totalSongs: Int        = 0,
+	@ColumnInfo(name = "total_albums") val totalAlbums: Int       = 0,
+	
+	// ── Timestamps (FIX: no System.currentTimeMillis() defaults) ──
+	@ColumnInfo(name = "date_added")   val dateAdded: Long,
+	@ColumnInfo(name = "last_updated") val lastUpdated: Long,
 )

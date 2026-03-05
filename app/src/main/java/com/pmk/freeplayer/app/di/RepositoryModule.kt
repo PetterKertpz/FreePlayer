@@ -1,19 +1,15 @@
 package com.pmk.freeplayer.app.di
 
 import com.pmk.freeplayer.data.repository.ArtistRepositoryImpl
-import com.pmk.freeplayer.data.repository.EnrichmentRepositoryImpl
-import com.pmk.freeplayer.data.repository.LibraryRepositoryImpl
-import com.pmk.freeplayer.data.repository.LyricsRepositoryImpl
-import com.pmk.freeplayer.data.repository.PlayerRepositoryImpl
+import com.pmk.freeplayer.feature.songs.data.repository.LibraryRepositoryImpl
 import com.pmk.freeplayer.data.repository.PlaylistRepositoryImpl
 import com.pmk.freeplayer.data.repository.ScannerRepositoryImpl
-import com.pmk.freeplayer.data.repository.SettingsRepositoryImpl
+import com.pmk.freeplayer.feature.settings.data.repository.SettingsRepositoryImpl
 import com.pmk.freeplayer.data.repository.UserRepositoryImpl
 import com.pmk.freeplayer.domain.repository.ArtistRepository
 import com.pmk.freeplayer.domain.repository.LibraryRepository
-import com.pmk.freeplayer.feature.player.domain.repository.PlayerRepository
 import com.pmk.freeplayer.feature.playlists.domain.repository.PlaylistRepository
-import com.pmk.freeplayer.core.domain.repository.SettingsRepository
+import com.pmk.freeplayer.feature.settings.domain.repository.SettingsRepository
 import com.pmk.freeplayer.feature.auth.domain.repository.UserRepository
 import dagger.Binds
 import dagger.Module

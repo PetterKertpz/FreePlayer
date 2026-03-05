@@ -1,66 +1,126 @@
 package com.pmk.freeplayer.feature.auth.domain.usecase
 
-// ─────────────────────────────────────────────────────────────────────────────
-// ABSORBE (eliminados):
-//   GetCurrentUserUseCase, UpdateUserProfileUseCase,
-//   GetUserStatsUseCase, RefreshUserStatsUseCase
-//
-// CONSERVA: data class UserProfileUpdate y su lógica de validación.
-// ─────────────────────────────────────────────────────────────────────────────
-
 import com.pmk.freeplayer.feature.auth.domain.model.User
-import com.pmk.freeplayer.feature.auth.domain.model.UserStats
 import com.pmk.freeplayer.feature.auth.domain.repository.UserRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 // ═════════════════════════════════════════════════════════════════════════════
-// PARÁMETROS — Actualización parcial del perfil
+// PARÁMETROS
 // ═════════════════════════════════════════════════════════════════════════════
 
 /**
- * Permite actualizar solo los campos del perfil que cambian.
+ * Actualización parcial del perfil.
  * Los campos `null` se ignoran — no sobreescriben el valor existente.
+ * Para borrar un campo nullable, pasar una cadena vacía `""`.
  */
 data class UserProfileUpdate(
 	val username: String? = null,
 	val fullName: String? = null,
-	/** URI local o remota del avatar. `null` = sin cambio. Pasar `""` para borrarlo. */
 	val avatarUri: String? = null,
 )
 
 // ═════════════════════════════════════════════════════════════════════════════
-// CONTENEDOR ÚNICO
+// GET — Consultas de sesión y perfil
 // ═════════════════════════════════════════════════════════════════════════════
 
 /**
- * Acceso al perfil y estadísticas del usuario.
+ * Consultas del usuario activo.
  *
  * Uso en ViewModel:
  * ```kotlin
- * userUseCase()                                           // Flow<User?>
- * userUseCase.stats()                                     // Flow<UserStats>
- * userUseCase.update(UserProfileUpdate(username = "Alex"))
- * userUseCase.refreshStats()
- * userUseCase.signOut()
- * userUseCase.deleteAccount()
+ * getUserUseCase()                // Flow<User?> — para observar sesión
+ * getUserUseCase.once()           // User? — para validaciones puntuales
  * ```
  */
-class UserUseCase @Inject constructor(
+class GetUserUseCase @Inject constructor(
 	private val repository: UserRepository,
 ) {
-	
-	/** Emite el [User] actual o `null` si no hay sesión. */
+	/** Observa el usuario activo de forma reactiva. */
 	operator fun invoke(): Flow<User?> = repository.getCurrentUser()
 	
-	/** Emite las [UserStats] calculadas desde el historial de reproducción. */
-	fun stats(): Flow<UserStats> = repository.getUserStats()
+	/** Obtiene el usuario activo una sola vez. */
+	suspend fun once(): User? = repository.getCurrentUserOnce()
+}
+
+// ═════════════════════════════════════════════════════════════════════════════
+// AUTH — Registro, login y recuperación
+// ═════════════════════════════════════════════════════════════════════════════
+
+/**
+ * Operaciones de autenticación: registro, login y recuperación de contraseña.
+ *
+ * Uso en ViewModel:
+ * ```kotlin
+ * authUseCase.registerLocal("user", "email@test.com", "pass")
+ * authUseCase.loginLocal("email@test.com", "pass")
+ * authUseCase.loginWithGoogle(idToken)
+ * authUseCase.loginWithFacebook(accessToken)
+ * authUseCase.recoverPassword("email@test.com")
+ * authUseCase.signOut()
+ * authUseCase.deleteAccount()
+ * authUseCase.isEmailTaken("email@test.com")
+ * authUseCase.isUsernameTaken("username")
+ * ```
+ */
+class AuthUseCase @Inject constructor(
+	private val repository: UserRepository,
+) {
+	suspend fun registerLocal(
+		username: String,
+		email: String,
+		password: String,
+	): Result<User> {
+		require(username.isNotBlank()) { "Username cannot be blank" }
+		require(email.isNotBlank()) { "Email cannot be blank" }
+		require(password.length >= 8) { "Password must be at least 8 characters" }
+		return repository.registerLocal(username.trim(), email.trim().lowercase(), password)
+	}
 	
+	suspend fun loginLocal(identifier: String, password: String): Result<User> {
+		require(identifier.isNotBlank()) { "Email or username cannot be blank" }
+		require(password.isNotBlank()) { "Password cannot be blank" }
+		return repository.loginLocal(identifier.trim(), password)
+	}
+	
+	suspend fun loginWithGoogle(activityContext: android.content.Context): Result<User> =
+		repository.loginWithGoogle(activityContext)
+	
+	suspend fun recoverPassword(email: String): Result<Unit> {
+		require(email.isNotBlank()) { "Email cannot be blank" }
+		return repository.recoverPassword(email.trim().lowercase())
+	}
+	
+	suspend fun signOut() = repository.signOut()
+	
+	suspend fun deleteAccount() = repository.deleteAccount()
+	
+	suspend fun isEmailTaken(email: String): Boolean =
+		repository.isEmailTaken(email.trim().lowercase())
+	
+	suspend fun isUsernameTaken(username: String): Boolean =
+		repository.isUsernameTaken(username.trim())
+}
+
+// ═════════════════════════════════════════════════════════════════════════════
+// PROFILE — Edición del perfil del usuario
+// ═════════════════════════════════════════════════════════════════════════════
+
+/**
+ * Mutaciones del perfil del usuario activo.
+ *
+ * Uso en ViewModel:
+ * ```kotlin
+ * manageProfileUseCase.update(UserProfileUpdate(username = "Alex"))
+ * manageProfileUseCase.updatePassword(current, new)
+ * ```
+ */
+class ManageProfileUseCase @Inject constructor(
+	private val repository: UserRepository,
+) {
 	/**
 	 * Aplica una actualización parcial del perfil.
 	 * Solo los campos no-null de [update] se persisten.
-	 *
-	 * @throws IllegalArgumentException si [UserProfileUpdate.username] está en blanco.
 	 */
 	suspend fun update(update: UserProfileUpdate) {
 		update.username?.let {
@@ -71,14 +131,15 @@ class UserUseCase @Inject constructor(
 			repository.updateFullName(it.trim().ifBlank { null })
 		}
 		update.avatarUri?.let {
-			repository.updateAvatar(it)
+			repository.updateAvatar(it.ifBlank { null })
 		}
 	}
 	
-	/** Recalcula [UserStats] desde el historial. Llamar tras sesiones largas. */
-	suspend fun refreshStats() = repository.refreshStats()
-	
-	suspend fun signOut() = repository.signOut()
-	
-	suspend fun deleteAccount() = repository.deleteAccount()
+	suspend fun updatePassword(
+		currentPassword: String,
+		newPassword: String,
+	): Result<Unit> {
+		require(newPassword.length >= 8) { "New password must be at least 8 characters" }
+		return repository.updatePassword(currentPassword, newPassword)
+	}
 }
