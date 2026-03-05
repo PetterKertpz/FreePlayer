@@ -1,5 +1,6 @@
 package com.pmk.freeplayer.app.di
 
+import com.pmk.freeplayer.app.AppStartupInitializer
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

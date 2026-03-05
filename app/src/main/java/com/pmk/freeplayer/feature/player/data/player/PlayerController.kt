@@ -1,8 +1,10 @@
 package com.pmk.freeplayer.feature.player.data.player
 
 import android.content.Context
+import androidx.annotation.OptIn
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
+import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
 import com.pmk.freeplayer.core.domain.model.enums.RepeatMode
 import com.pmk.freeplayer.feature.player.domain.model.PlaybackProgress
@@ -27,6 +29,7 @@ class PlayerController @Inject constructor(
 	@ApplicationContext private val context: Context,
 	val queueManager: QueueManager,
 	private val audioFocusHandler: AudioFocusHandler,
+	val audioEffectController: AudioEffectController,
 ) {
 	private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 	
@@ -37,7 +40,7 @@ class PlayerController @Inject constructor(
 	private var trackStartMs: Long = 0L
 	private var listenedMs:   Long = 0L
 	
-	private val exoPlayer: ExoPlayer by lazy {
+	internal val exoPlayer: ExoPlayer by lazy {
 		ExoPlayer.Builder(context).build().apply {
 			addListener(playerListener)
 		}
@@ -113,19 +116,21 @@ class PlayerController @Inject constructor(
 	
 	fun setPlaybackSpeed(speed: Float) { exoPlayer.setPlaybackSpeed(speed) }
 	
-	fun setEqualizerEnabled(enabled: Boolean) { /* Configured in PlayerService via AudioEffect */ }
-	fun setBassBoost(level: Int)              { /* Delegated to AudioEffect in PlayerService  */ }
-	fun setVirtualizer(level: Int)            { /* Delegated to AudioEffect in PlayerService  */ }
+	fun setEqualizerEnabled(enabled: Boolean) = audioEffectController.setEqualizerEnabled(enabled)
+	fun setBassBoost(level: Int)              = audioEffectController.setBassBoost(level)
+	fun setVirtualizer(level: Int)            = audioEffectController.setVirtualizer(level)
 	
 	fun release() {
 		audioFocusHandler.abandon()
 		stopProgress()
+		audioEffectController.release()
 		exoPlayer.release()
 		_state.value = PlayerState.Idle
 	}
 	
 	// ── Private helpers ───────────────────────────────────────────
 	
+	@OptIn(UnstableApi::class)
 	private fun loadCurrent() {
 		val item = queueManager.currentItem ?: return
 		exoPlayer.setMediaItem(MediaItem.fromUri(item.filePath))
@@ -133,6 +138,7 @@ class PlayerController @Inject constructor(
 		exoPlayer.play()
 		trackStartMs = System.currentTimeMillis()
 		listenedMs   = 0L
+		audioEffectController.attach(exoPlayer.audioSessionId)
 	}
 	
 	private fun startProgressUpdates() {

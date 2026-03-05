@@ -35,6 +35,9 @@ interface PlayerRepository {
 	fun setBassBoost(level: Int)
 	fun setVirtualizer(level: Int)
 	
+	fun setBandLevel(band: Short, levelMilliBel: Short)   // ← nuevo
+	fun getBandLevels(): List<Pair<Short, Short>>
+	
 	// ── Lifecycle ─────────────────────────────────────────────────
 	fun release()
 }

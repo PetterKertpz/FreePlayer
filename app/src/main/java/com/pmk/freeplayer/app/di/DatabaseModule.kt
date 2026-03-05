@@ -38,25 +38,22 @@ object DatabaseModule {
 	// DAOs como extension functions para evitar boilerplate
 	@Provides
 	fun provideSongDao(db: AppDatabase): SongDao = db.songDao()
-	
 	@Provides
 	fun provideAlbumDao(db: AppDatabase): AlbumDao = db.albumDao()
-	
 	@Provides
 	fun provideArtistDao(db: AppDatabase): ArtistDao = db.artistDao()
-	
 	@Provides
 	fun providePlaylistDao(db: AppDatabase): PlaylistDao = db.playlistDao()
-	
-	
 	@Provides
 	fun provideGenreDao(db: AppDatabase): GenreDao = db.genreDao()
 	
+	@Provides
 	fun provideUserDao(db: AppDatabase): UserDao = db.userDao()
 	
 	@Provides
 	fun provideStatisticsDao(db: AppDatabase): StatisticsDao = db.statisticsDao()
 	
-	
+	@Provides
+	fun lyricsDao(db: AppDatabase) = db.lyricsDao()
 }
 
